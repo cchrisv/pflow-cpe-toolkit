@@ -88,7 +88,10 @@ private class PFlowCpeChoiceEngineControllerTest {
             null,
             null,
             null,
-            'coreflow'
+            'PflowCpeDetailSrch',
+            null,
+            null,
+            null
         );
         Assert.isTrue(!rows.isEmpty());
     }
