@@ -14,8 +14,8 @@ private class PFlowCpeChoiceEngineControllerTest {
         req.valueFieldName = 'Id';
         PFlowCpeChoiceEngineController.LookupValidationResult r = PFlowCpeChoiceEngineController.validateLookupConfiguration(req);
         String cfgMsg = r.configurationMessage == null ? '' : r.configurationMessage;
-        System.assertEquals(true, r.isConfigurationValid, cfgMsg);
-        System.assertEquals(true, r.displayFieldSupportsSearch);
+        Assert.areEqual(true, r.isConfigurationValid, cfgMsg);
+        Assert.areEqual(true, r.displayFieldSupportsSearch);
     }
 
     @IsTest
@@ -25,7 +25,7 @@ private class PFlowCpeChoiceEngineControllerTest {
         req.displayedFieldName = 'Name';
         req.valueFieldName = 'Id';
         PFlowCpeChoiceEngineController.LookupValidationResult r = PFlowCpeChoiceEngineController.validateLookupConfiguration(req);
-        System.assertEquals(false, r.isConfigurationValid);
+        Assert.areEqual(false, r.isConfigurationValid);
     }
 
     @IsTest
@@ -35,7 +35,7 @@ private class PFlowCpeChoiceEngineControllerTest {
         req.displayedFieldName = 'NotARealField9999';
         req.valueFieldName = 'Id';
         PFlowCpeChoiceEngineController.LookupValidationResult r = PFlowCpeChoiceEngineController.validateLookupConfiguration(req);
-        System.assertEquals(false, r.isConfigurationValid);
+        Assert.areEqual(false, r.isConfigurationValid);
     }
 
     @IsTest
@@ -46,8 +46,8 @@ private class PFlowCpeChoiceEngineControllerTest {
         req.valueFieldName = 'Id';
         req.whereClause = 'Name = \'__nomatch_coreflow_test__\'';
         PFlowCpeChoiceEngineController.LookupValidationResult r = PFlowCpeChoiceEngineController.validateLookupConfiguration(req);
-        System.assertEquals(true, r.isConfigurationValid);
-        System.assertEquals(false, r.hasMatchingRows);
+        Assert.areEqual(true, r.isConfigurationValid);
+        Assert.areEqual(false, r.hasMatchingRows);
     }
 
     @IsTest
@@ -57,7 +57,7 @@ private class PFlowCpeChoiceEngineControllerTest {
         req.displayedFieldName = 'Name';
         req.valueFieldName = 'Id';
         List<PFlowCpeChoiceEngineController.ChoiceOption> rows = PFlowCpeChoiceEngineController.getLookupSearchResults(req);
-        System.assertEquals(0, rows.size());
+        Assert.areEqual(0, rows.size());
     }
 
     @IsTest
@@ -72,7 +72,7 @@ private class PFlowCpeChoiceEngineControllerTest {
         req.otherFields = 'Phone';
         req.searchTerm = 'PflowCpe';
         List<PFlowCpeChoiceEngineController.ChoiceOption> rows = PFlowCpeChoiceEngineController.getLookupSearchResults(req);
-        System.assert(!rows.isEmpty());
+        Assert.isTrue(!rows.isEmpty());
     }
 
     @IsTest
@@ -90,7 +90,7 @@ private class PFlowCpeChoiceEngineControllerTest {
             null,
             'coreflow'
         );
-        System.assert(!rows.isEmpty());
+        Assert.isTrue(!rows.isEmpty());
     }
 
     @IsTest
@@ -102,7 +102,7 @@ private class PFlowCpeChoiceEngineControllerTest {
         gr.displayedFieldName = 'Name';
         gr.valueFieldName = 'Id';
         List<PFlowCpeChoiceEngineController.ChoiceOption> rs = PFlowCpeChoiceEngineController.getRecords(gr);
-        System.assert(!rs.isEmpty());
+        Assert.isTrue(!rs.isEmpty());
     }
 
     @IsTest
@@ -114,8 +114,8 @@ private class PFlowCpeChoiceEngineControllerTest {
         fv.objId = a.Id;
         fv.label = 'Name';
         PFlowCpeChoiceEngineController.ChoiceOption one = PFlowCpeChoiceEngineController.getFieldValue(fv);
-        System.assertNotEquals(null, one);
-        System.assertEquals(a.Id, one.value);
+        Assert.areNotEqual(null, one);
+        Assert.areEqual(a.Id, one.value);
     }
 
     @IsTest
@@ -125,7 +125,7 @@ private class PFlowCpeChoiceEngineControllerTest {
         fv.objId = null;
         fv.label = 'Name';
         PFlowCpeChoiceEngineController.ChoiceOption one = PFlowCpeChoiceEngineController.getFieldValue(fv);
-        System.assertEquals(null, one);
+        Assert.areEqual(null, one);
     }
 
     @IsTest
@@ -144,13 +144,13 @@ private class PFlowCpeChoiceEngineControllerTest {
         req.valueFieldName = 'Id';
         req.otherFields = 'NotARealField9999';
         PFlowCpeChoiceEngineController.LookupValidationResult r = PFlowCpeChoiceEngineController.validateLookupConfiguration(req);
-        System.assertEquals(false, r.isConfigurationValid);
+        Assert.areEqual(false, r.isConfigurationValid);
     }
 
     @IsTest
     static void testValidateLookup_nullRequest() {
         PFlowCpeChoiceEngineController.LookupValidationResult r = PFlowCpeChoiceEngineController.validateLookupConfiguration(null);
-        System.assertEquals(false, r.isConfigurationValid);
+        Assert.areEqual(false, r.isConfigurationValid);
     }
 
     @IsTest
@@ -169,19 +169,19 @@ private class PFlowCpeChoiceEngineControllerTest {
             null
         );
         String m = r.configurationMessage == null ? '' : r.configurationMessage;
-        System.assertEquals(true, r.isConfigurationValid, m);
+        Assert.areEqual(true, r.isConfigurationValid, m);
     }
 
     @IsTest
     static void testGetLookupSearchResults_nullRequest() {
         List<PFlowCpeChoiceEngineController.ChoiceOption> rows = PFlowCpeChoiceEngineController.getLookupSearchResults(null);
-        System.assertEquals(0, rows.size());
+        Assert.areEqual(0, rows.size());
     }
 
     @IsTest
     static void testGetRecords_nullRequest() {
         List<PFlowCpeChoiceEngineController.ChoiceOption> rs = PFlowCpeChoiceEngineController.getRecords(null);
-        System.assertEquals(0, rs.size());
+        Assert.areEqual(0, rs.size());
     }
 
     @IsTest
@@ -194,7 +194,7 @@ private class PFlowCpeChoiceEngineControllerTest {
         req.valueFieldName = 'Id';
         req.searchTerm = '884422';
         List<PFlowCpeChoiceEngineController.ChoiceOption> rows = PFlowCpeChoiceEngineController.getSoslSearchResults(req);
-        System.assert(!rows.isEmpty(), 'SOSL should find inserted Account by name token');
+        Assert.isTrue(!rows.isEmpty(), 'SOSL should find inserted Account by name token');
     }
 
     @IsTest
@@ -205,7 +205,7 @@ private class PFlowCpeChoiceEngineControllerTest {
         req.valueFieldName = 'Id';
         req.searchTerm = 'x';
         List<PFlowCpeChoiceEngineController.ChoiceOption> rows = PFlowCpeChoiceEngineController.getSoslSearchResults(req);
-        System.assertEquals(0, rows.size());
+        Assert.areEqual(0, rows.size());
     }
 
     // --- Field selector tests ---
@@ -219,7 +219,7 @@ private class PFlowCpeChoiceEngineControllerTest {
         Boolean accountOk =
             Schema.getGlobalDescribe().containsKey('Account') &&
             Schema.getGlobalDescribe().get('Account').getDescribe().isAccessible();
-        System.assert(accountOk, 'Account should be accessible in describe for this org');
+        Assert.isTrue(accountOk, 'Account should be accessible in describe for this org');
 
         if (fields.isEmpty()) {
             return;
@@ -231,25 +231,25 @@ private class PFlowCpeChoiceEngineControllerTest {
                 break;
             }
         }
-        System.assert(hasName, 'Account.Name should be present when any Account fields are readable');
+        Assert.isTrue(hasName, 'Account.Name should be present when any Account fields are readable');
     }
 
     @IsTest
     static void testGetObjectFieldsBlankNameReturnsEmpty() {
-        System.assertEquals(0, PFlowCpeChoiceEngineController.getObjectFields(null).size());
-        System.assertEquals(0, PFlowCpeChoiceEngineController.getObjectFields('').size());
-        System.assertEquals(0, PFlowCpeChoiceEngineController.getObjectFields('   ').size());
+        Assert.areEqual(0, PFlowCpeChoiceEngineController.getObjectFields(null).size());
+        Assert.areEqual(0, PFlowCpeChoiceEngineController.getObjectFields('').size());
+        Assert.areEqual(0, PFlowCpeChoiceEngineController.getObjectFields('   ').size());
     }
 
     @IsTest
     static void testGetObjectFieldsInvalidTypeReturnsEmpty() {
-        System.assertEquals(0, PFlowCpeChoiceEngineController.getObjectFields('NotARealObjectZZZ999').size());
+        Assert.areEqual(0, PFlowCpeChoiceEngineController.getObjectFields('NotARealObjectZZZ999').size());
     }
 
     @IsTest
     static void testSearchSObjectTypesReturnsAccount() {
         List<PFlowCpeChoiceEngineController.ChoiceOption> rows = PFlowCpeChoiceEngineController.searchSObjectTypes('accoun');
-        System.assert(!rows.isEmpty());
+        Assert.isTrue(!rows.isEmpty());
         Boolean found = false;
         for (PFlowCpeChoiceEngineController.ChoiceOption r : rows) {
             if (r.value == 'Account') {
@@ -257,7 +257,7 @@ private class PFlowCpeChoiceEngineControllerTest {
                 break;
             }
         }
-        System.assert(found);
+        Assert.isTrue(found);
     }
 
     @IsTest
@@ -273,12 +273,12 @@ private class PFlowCpeChoiceEngineControllerTest {
                 break;
             }
         }
-        System.assert(anyPicklist);
+        Assert.isTrue(anyPicklist);
     }
 
     @IsTest
     static void testGetControllerFieldApiNameNameFieldReturnsBlank() {
-        System.assertEquals('', PFlowCpeChoiceEngineController.getControllerFieldApiName('Account', 'Name'));
+        Assert.areEqual('', PFlowCpeChoiceEngineController.getControllerFieldApiName('Account', 'Name'));
     }
 
     @IsTest
@@ -288,25 +288,25 @@ private class PFlowCpeChoiceEngineControllerTest {
             'Industry',
             ''
         );
-        System.assertEquals(0, vals.size());
+        Assert.areEqual(0, vals.size());
     }
 
     @IsTest
     static void testSearchSObjectTypesBlankReturnsRows() {
         List<PFlowCpeChoiceEngineController.ChoiceOption> rows = PFlowCpeChoiceEngineController.searchSObjectTypes('');
-        System.assert(!rows.isEmpty());
+        Assert.isTrue(!rows.isEmpty());
     }
 
     @IsTest
     static void testSearchPicklistFieldsBlankObjectReturnsEmpty() {
-        System.assertEquals(0, PFlowCpeChoiceEngineController.searchPicklistFieldsForObject('', 'x').size());
-        System.assertEquals(0, PFlowCpeChoiceEngineController.searchPicklistFieldsForObject(null, 'x').size());
+        Assert.areEqual(0, PFlowCpeChoiceEngineController.searchPicklistFieldsForObject('', 'x').size());
+        Assert.areEqual(0, PFlowCpeChoiceEngineController.searchPicklistFieldsForObject(null, 'x').size());
     }
 
     @IsTest
     static void testGetControllerFieldBlankArgs() {
-        System.assertEquals('', PFlowCpeChoiceEngineController.getControllerFieldApiName('', 'Name'));
-        System.assertEquals('', PFlowCpeChoiceEngineController.getControllerFieldApiName('Account', ''));
+        Assert.areEqual('', PFlowCpeChoiceEngineController.getControllerFieldApiName('', 'Name'));
+        Assert.areEqual('', PFlowCpeChoiceEngineController.getControllerFieldApiName('Account', ''));
     }
 
     @IsTest
@@ -320,12 +320,12 @@ private class PFlowCpeChoiceEngineControllerTest {
             'Industry',
             ''
         );
-        System.assert(!vals.isEmpty());
+        Assert.isTrue(!vals.isEmpty());
     }
 
     @IsTest
     static void testSearchPicklistValuesForNonPicklistFieldReturnsEmpty() {
-        System.assertEquals(
+        Assert.areEqual(
             0,
             PFlowCpeChoiceEngineController.searchPicklistValuesForFieldForTest('Account', 'Name', '').size()
         );
@@ -333,12 +333,12 @@ private class PFlowCpeChoiceEngineControllerTest {
 
     @IsTest
     static void testSearchPicklistFieldsBogusObjectReturnsEmpty() {
-        System.assertEquals(0, PFlowCpeChoiceEngineController.searchPicklistFieldsForObject('NotAnObjectZZZ__c', '').size());
+        Assert.areEqual(0, PFlowCpeChoiceEngineController.searchPicklistFieldsForObject('NotAnObjectZZZ__c', '').size());
     }
 
     @IsTest
     static void testSearchControllerPicklistBogusObjectReturnsEmpty() {
-        System.assertEquals(
+        Assert.areEqual(
             0,
             PFlowCpeChoiceEngineController.searchControllerPicklistValues('NotAnObjectZZZ__c', 'Field__c', '').size()
         );
@@ -346,7 +346,7 @@ private class PFlowCpeChoiceEngineControllerTest {
 
     @IsTest
     static void testSearchPicklistValuesBogusObjectReturnsEmpty() {
-        System.assertEquals(
+        Assert.areEqual(
             0,
             PFlowCpeChoiceEngineController.searchPicklistValuesForFieldForTest('NotAnObjectZZZ__c', 'Industry', '').size()
         );
@@ -362,13 +362,13 @@ private class PFlowCpeChoiceEngineControllerTest {
             'Industry',
             'zzzznomatch999'
         );
-        System.assertEquals(0, vals.size());
+        Assert.areEqual(0, vals.size());
     }
 
     @IsTest
     static void testSearchSObjectTypesNoMatchReturnsEmpty() {
         List<PFlowCpeChoiceEngineController.ChoiceOption> rows = PFlowCpeChoiceEngineController.searchSObjectTypes('zzzzzznomatchobject99999');
-        System.assertEquals(0, rows.size());
+        Assert.areEqual(0, rows.size());
     }
 
     @IsTest
@@ -377,7 +377,7 @@ private class PFlowCpeChoiceEngineControllerTest {
             return;
         }
         List<PFlowCpeChoiceEngineController.ChoiceOption> rts = PFlowCpeChoiceEngineController.getRecordTypeOptions('Lead');
-        System.assert(!rts.isEmpty());
+        Assert.isTrue(!rts.isEmpty());
     }
 
     @IsTest
@@ -386,7 +386,7 @@ private class PFlowCpeChoiceEngineControllerTest {
             return;
         }
         List<PFlowCpeChoiceEngineController.ChoiceOption> rows = PFlowCpeChoiceEngineController.searchLookupDatasetFieldsForObject('Lead', '');
-        System.assert(!rows.isEmpty());
+        Assert.isTrue(!rows.isEmpty());
         Boolean sawName = false;
         for (PFlowCpeChoiceEngineController.ChoiceOption r : rows) {
             if (r != null && r.value == 'Name') {
@@ -394,6 +394,6 @@ private class PFlowCpeChoiceEngineControllerTest {
                 break;
             }
         }
-        System.assert(sawName);
+        Assert.isTrue(sawName);
     }
 }

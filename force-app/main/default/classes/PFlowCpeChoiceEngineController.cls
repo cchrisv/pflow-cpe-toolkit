@@ -2,7 +2,7 @@
  * @description Unified Apex for core Flow choice components: metadata pickers (CPE), SOQL/SOSL datasets,
  * validation, and resource-picker describe. Adapted from coreFlow CoreFlowChoiceEngineController.
  */
-@SuppressWarnings('PMD.CognitiveComplexity, PMD.CyclomaticComplexity, PMD.ExcessiveParameterList, PMD.ApexCRUDViolation')
+@SuppressWarnings('PMD.CognitiveComplexity, PMD.CyclomaticComplexity, PMD.ExcessiveParameterList')
 public with sharing class PFlowCpeChoiceEngineController {
     /** @description Used by PFlowCpeChoiceEngineLog / future Nebula scenario name alignment. */
     public static final String LOG_SCENARIO_NAME = 'Core Flow Choice Engine';
@@ -459,7 +459,7 @@ public with sharing class PFlowCpeChoiceEngineController {
     // --- Runtime: SOQL ---
 
     @SuppressWarnings('PMD.ExcessiveParameterList')
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static LookupValidationResult validateLookupConfigurationDetailed(
         String sObjectName,
         String displayedFieldName,
@@ -494,7 +494,7 @@ public with sharing class PFlowCpeChoiceEngineController {
         }
     }
 
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static LookupValidationResult validateLookupConfiguration(SearchRequest request) {
         PFlowCpeChoiceEngineLog.setScenario();
         try {
@@ -848,7 +848,7 @@ public with sharing class PFlowCpeChoiceEngineController {
         return '\'*' + esc + '*\'';
     }
 
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static ChoiceOption getFieldValue(GetFieldValueRequest request) {
         PFlowCpeChoiceEngineLog.setScenario();
         try {
@@ -888,7 +888,7 @@ public with sharing class PFlowCpeChoiceEngineController {
         );
     }
 
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static String getReference(String field) {
         PFlowCpeChoiceEngineLog.setScenario();
         try {
@@ -921,7 +921,7 @@ public with sharing class PFlowCpeChoiceEngineController {
         return objName;
     }
 
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static String getHelpText(String field) {
         PFlowCpeChoiceEngineLog.setScenario();
         try {
