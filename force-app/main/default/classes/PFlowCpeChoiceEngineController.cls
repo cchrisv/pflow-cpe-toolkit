@@ -4,9 +4,6 @@
  */
 @SuppressWarnings('PMD.CognitiveComplexity, PMD.CyclomaticComplexity, PMD.ExcessiveParameterList')
 public with sharing class PFlowCpeChoiceEngineController {
-    /** @description Used by PFlowCpeChoiceEngineLog / future Nebula scenario name alignment. */
-    public static final String LOG_SCENARIO_NAME = 'Core Flow Choice Engine';
-
     private static final Integer MAX_ROWS = 50;
     private static final Integer MAX_LOOKUP_ROWS = 80;
     private static final Integer MAX_PICKLIST_FIELD_LOOKUP_ROWS = 2000;
@@ -151,14 +148,10 @@ public with sharing class PFlowCpeChoiceEngineController {
 
     @AuraEnabled(cacheable=true)
     public static List<ChoiceOption> searchSObjectTypes(String searchKey) {
-        PFlowCpeChoiceEngineLog.setScenario();
         try {
             return searchSObjectTypesCore(searchKey);
         } catch (Exception e) {
-            PFlowCpeChoiceEngineLog.error('searchSObjectTypes', e);
-            return new List<ChoiceOption>();
-        } finally {
-            PFlowCpeChoiceEngineLog.saveLog();
+            throw new AuraHandledException('searchSObjectTypes failed: ' + e.getMessage());
         }
     }
 
@@ -185,14 +178,10 @@ public with sharing class PFlowCpeChoiceEngineController {
 
     @AuraEnabled(cacheable=true)
     public static List<ChoiceOption> searchPicklistFieldsForObject(String objectApiName, String searchKey) {
-        PFlowCpeChoiceEngineLog.setScenario();
         try {
             return searchPicklistFieldsForObjectCore(objectApiName, searchKey);
         } catch (Exception e) {
-            PFlowCpeChoiceEngineLog.error('searchPicklistFieldsForObject', e);
-            return new List<ChoiceOption>();
-        } finally {
-            PFlowCpeChoiceEngineLog.saveLog();
+            throw new AuraHandledException('searchPicklistFieldsForObject failed: ' + e.getMessage());
         }
     }
 
@@ -228,14 +217,10 @@ public with sharing class PFlowCpeChoiceEngineController {
 
     @AuraEnabled(cacheable=true)
     public static List<ChoiceOption> searchLookupDatasetFieldsForObject(String objectApiName, String searchKey) {
-        PFlowCpeChoiceEngineLog.setScenario();
         try {
             return searchLookupDatasetFieldsForObjectCore(objectApiName, searchKey);
         } catch (Exception e) {
-            PFlowCpeChoiceEngineLog.error('searchLookupDatasetFieldsForObject', e);
-            return new List<ChoiceOption>();
-        } finally {
-            PFlowCpeChoiceEngineLog.saveLog();
+            throw new AuraHandledException('searchLookupDatasetFieldsForObject failed: ' + e.getMessage());
         }
     }
 
@@ -269,14 +254,10 @@ public with sharing class PFlowCpeChoiceEngineController {
 
     @AuraEnabled(cacheable=true)
     public static List<ChoiceOption> getRecordTypeOptions(String objectApiName) {
-        PFlowCpeChoiceEngineLog.setScenario();
         try {
             return getRecordTypeOptionsCore(objectApiName);
         } catch (Exception e) {
-            PFlowCpeChoiceEngineLog.error('getRecordTypeOptions', e);
-            return new List<ChoiceOption>();
-        } finally {
-            PFlowCpeChoiceEngineLog.saveLog();
+            throw new AuraHandledException('getRecordTypeOptions failed: ' + e.getMessage());
         }
     }
 
@@ -311,14 +292,10 @@ public with sharing class PFlowCpeChoiceEngineController {
 
     @AuraEnabled(cacheable=true)
     public static String getControllerFieldApiName(String objectApiName, String dependentFieldApiName) {
-        PFlowCpeChoiceEngineLog.setScenario();
         try {
             return getControllerFieldApiNameCore(objectApiName, dependentFieldApiName);
         } catch (Exception e) {
-            PFlowCpeChoiceEngineLog.error('getControllerFieldApiName', e);
-            return '';
-        } finally {
-            PFlowCpeChoiceEngineLog.saveLog();
+            throw new AuraHandledException('getControllerFieldApiName failed: ' + e.getMessage());
         }
     }
 
@@ -348,7 +325,6 @@ public with sharing class PFlowCpeChoiceEngineController {
         String dependentFieldApiName,
         String searchKey
     ) {
-        PFlowCpeChoiceEngineLog.setScenario();
         try {
             String ctrl = getControllerFieldApiNameCore(objectApiName, dependentFieldApiName);
             if (String.isBlank(ctrl)) {
@@ -356,10 +332,7 @@ public with sharing class PFlowCpeChoiceEngineController {
             }
             return searchPicklistValuesForFieldCore(objectApiName, ctrl, searchKey);
         } catch (Exception e) {
-            PFlowCpeChoiceEngineLog.error('searchControllerPicklistValues', e);
-            return new List<ChoiceOption>();
-        } finally {
-            PFlowCpeChoiceEngineLog.saveLog();
+            throw new AuraHandledException('searchControllerPicklistValues failed: ' + e.getMessage());
         }
     }
 
@@ -409,14 +382,10 @@ public with sharing class PFlowCpeChoiceEngineController {
 
     @AuraEnabled(cacheable=true)
     public static List<Field> getObjectFields(String objectName) {
-        PFlowCpeChoiceEngineLog.setScenario();
         try {
             return getObjectFieldsCore(objectName);
         } catch (Exception e) {
-            PFlowCpeChoiceEngineLog.error('getObjectFields', e);
-            return new List<Field>();
-        } finally {
-            PFlowCpeChoiceEngineLog.saveLog();
+            throw new AuraHandledException('getObjectFields failed: ' + e.getMessage());
         }
     }
 
@@ -470,7 +439,6 @@ public with sharing class PFlowCpeChoiceEngineController {
         String filteredFieldName,
         String filterFieldValue
     ) {
-        PFlowCpeChoiceEngineLog.setScenario();
         try {
             SearchRequest req = new SearchRequest();
             req.sObjectName = sObjectName;
@@ -484,29 +452,16 @@ public with sharing class PFlowCpeChoiceEngineController {
             req.searchTerm = null;
             return validateLookupConfigurationCore(req);
         } catch (Exception e) {
-            PFlowCpeChoiceEngineLog.error('validateLookupConfigurationDetailed', e);
-            LookupValidationResult r = new LookupValidationResult();
-            r.isConfigurationValid = false;
-            r.configurationMessage = 'Validation failed: ' + e.getMessage();
-            return r;
-        } finally {
-            PFlowCpeChoiceEngineLog.saveLog();
+            throw new AuraHandledException('validateLookupConfigurationDetailed failed: ' + e.getMessage());
         }
     }
 
     @AuraEnabled(cacheable=true)
     public static LookupValidationResult validateLookupConfiguration(SearchRequest request) {
-        PFlowCpeChoiceEngineLog.setScenario();
         try {
             return validateLookupConfigurationCore(request);
         } catch (Exception e) {
-            PFlowCpeChoiceEngineLog.error('validateLookupConfiguration', e);
-            LookupValidationResult r = new LookupValidationResult();
-            r.isConfigurationValid = false;
-            r.configurationMessage = 'Validation failed: ' + e.getMessage();
-            return r;
-        } finally {
-            PFlowCpeChoiceEngineLog.saveLog();
+            throw new AuraHandledException('validateLookupConfiguration failed: ' + e.getMessage());
         }
     }
 
@@ -592,7 +547,6 @@ public with sharing class PFlowCpeChoiceEngineController {
                     'No rows match this object and filters for the running user. The lookup will be empty until data or filters change.';
             }
         } catch (Exception e) {
-            PFlowCpeChoiceEngineLog.error('validateLookupConfigurationCore count', e);
             res.configurationMessage = 'Query cannot run: ' + e.getMessage();
             return res;
         }
@@ -632,14 +586,10 @@ public with sharing class PFlowCpeChoiceEngineController {
 
     @AuraEnabled
     public static List<ChoiceOption> getRecords(GetRecordsRequest request) {
-        PFlowCpeChoiceEngineLog.setScenario();
         try {
             return getRecordsCore(request);
         } catch (Exception e) {
-            PFlowCpeChoiceEngineLog.error('getRecords', e);
-            return new List<ChoiceOption>();
-        } finally {
-            PFlowCpeChoiceEngineLog.saveLog();
+            throw new AuraHandledException('getRecords failed: ' + e.getMessage());
         }
     }
 
@@ -697,7 +647,6 @@ public with sharing class PFlowCpeChoiceEngineController {
         String orderByDirection,
         Integer queryLimit
     ) {
-        PFlowCpeChoiceEngineLog.setScenario();
         try {
             SearchRequest req = new SearchRequest();
             req.sObjectName = sObjectName;
@@ -714,23 +663,16 @@ public with sharing class PFlowCpeChoiceEngineController {
             req.queryLimit = queryLimit;
             return getLookupSearchResultsCore(req);
         } catch (Exception e) {
-            PFlowCpeChoiceEngineLog.error('getLookupSearchResultsDetailed', e);
-            return new List<ChoiceOption>();
-        } finally {
-            PFlowCpeChoiceEngineLog.saveLog();
+            throw new AuraHandledException('getLookupSearchResultsDetailed failed: ' + e.getMessage());
         }
     }
 
     @AuraEnabled(cacheable=true)
     public static List<ChoiceOption> getLookupSearchResults(SearchRequest request) {
-        PFlowCpeChoiceEngineLog.setScenario();
         try {
             return getLookupSearchResultsCore(request);
         } catch (Exception e) {
-            PFlowCpeChoiceEngineLog.error('getLookupSearchResults', e);
-            return new List<ChoiceOption>();
-        } finally {
-            PFlowCpeChoiceEngineLog.saveLog();
+            throw new AuraHandledException('getLookupSearchResults failed: ' + e.getMessage());
         }
     }
 
@@ -766,14 +708,10 @@ public with sharing class PFlowCpeChoiceEngineController {
 
     @AuraEnabled(cacheable=true)
     public static List<ChoiceOption> getSoslSearchResults(SearchRequest request) {
-        PFlowCpeChoiceEngineLog.setScenario();
         try {
             return getSoslSearchResultsCore(request);
         } catch (Exception e) {
-            PFlowCpeChoiceEngineLog.error('getSoslSearchResults', e);
-            return new List<ChoiceOption>();
-        } finally {
-            PFlowCpeChoiceEngineLog.saveLog();
+            throw new AuraHandledException('getSoslSearchResults failed: ' + e.getMessage());
         }
     }
 
@@ -826,7 +764,7 @@ public with sharing class PFlowCpeChoiceEngineController {
         try {
             raw = Search.query(sosl);
         } catch (Exception e) {
-            PFlowCpeChoiceEngineLog.error('SOSL failed: ' + sosl, e);
+            // SOSL '+ sosl + ' threw — swallow and fall through to empty result
             return results;
         }
         if (raw == null || raw.isEmpty()) {
@@ -850,14 +788,10 @@ public with sharing class PFlowCpeChoiceEngineController {
 
     @AuraEnabled(cacheable=true)
     public static ChoiceOption getFieldValue(GetFieldValueRequest request) {
-        PFlowCpeChoiceEngineLog.setScenario();
         try {
             return getFieldValueCore(request);
         } catch (Exception e) {
-            PFlowCpeChoiceEngineLog.error('getFieldValue', e);
-            return null;
-        } finally {
-            PFlowCpeChoiceEngineLog.saveLog();
+            throw new AuraHandledException('getFieldValue failed: ' + e.getMessage());
         }
     }
 
@@ -890,14 +824,10 @@ public with sharing class PFlowCpeChoiceEngineController {
 
     @AuraEnabled(cacheable=true)
     public static String getReference(String field) {
-        PFlowCpeChoiceEngineLog.setScenario();
         try {
             return getReferenceCore(field);
         } catch (Exception e) {
-            PFlowCpeChoiceEngineLog.error('getReference', e);
-            return null;
-        } finally {
-            PFlowCpeChoiceEngineLog.saveLog();
+            throw new AuraHandledException('getReference failed: ' + e.getMessage());
         }
     }
 
@@ -923,15 +853,11 @@ public with sharing class PFlowCpeChoiceEngineController {
 
     @AuraEnabled(cacheable=true)
     public static String getHelpText(String field) {
-        PFlowCpeChoiceEngineLog.setScenario();
         try {
             Schema.SObjectField f = resolveFieldToken(field);
             return f == null ? null : f.getDescribe().getInlineHelpText();
         } catch (Exception e) {
-            PFlowCpeChoiceEngineLog.error('getHelpText', e);
-            return null;
-        } finally {
-            PFlowCpeChoiceEngineLog.saveLog();
+            throw new AuraHandledException('getHelpText failed: ' + e.getMessage());
         }
     }
 
