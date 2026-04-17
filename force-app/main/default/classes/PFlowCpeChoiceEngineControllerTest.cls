@@ -191,6 +191,8 @@ private class PFlowCpeChoiceEngineControllerTest {
     static void testGetSoslSearchResults_account() {
         Account a = new Account(Name = 'PflowCpeSoslUnique 884422');
         insert a;
+        // SOSL does not run against uncommitted test data; stub the results.
+        Test.setFixedSearchResults(new List<Id>{ a.Id });
         PFlowCpeChoiceEngineController.SearchRequest req = new PFlowCpeChoiceEngineController.SearchRequest();
         req.sObjectName = 'Account';
         req.displayedFieldName = 'Name';
