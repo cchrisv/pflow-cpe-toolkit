@@ -1,0 +1,24 @@
+<template>
+    <div class="slds-card slds-p-around_medium">
+        <h2 class="slds-text-heading_small slds-m-bottom_small">{displayLabel}</h2>
+        <dl class="slds-list_horizontal slds-wrap">
+            <dt class="slds-item_label slds-text-color_weak">SObject:</dt>
+            <dd class="slds-item_detail">{sobjectApiName}</dd>
+
+            <dt class="slds-item_label slds-text-color_weak">Sort field:</dt>
+            <dd class="slds-item_detail">{sortField}</dd>
+
+            <dt class="slds-item_label slds-text-color_weak">Additional fields:</dt>
+            <dd class="slds-item_detail">{additionalFields}</dd>
+
+            <dt class="slds-item_label slds-text-color_weak">Where clause:</dt>
+            <dd class="slds-item_detail">{whereClause}</dd>
+
+            <dt class="slds-item_label slds-text-color_weak">Order:</dt>
+            <dd class="slds-item_detail">{orderSummary}</dd>
+
+            <dt class="slds-item_label slds-text-color_weak">Limit:</dt>
+            <dd class="slds-item_detail">{queryLimit}</dd>
+        </dl>
+    </div>
+</template>

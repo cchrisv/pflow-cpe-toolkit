@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Demo | Kitchen Sink</masterLabel>
+    <description>Stress-test runtime LWC exercising every PropertyEditor property type.</description>
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen" configurationEditor="c-demo-kitchen-sink-cpe">
+            <property name="label" type="String" label="Label" default="Kitchen Sink" />
+            <property name="textValue" type="String" label="Text" />
+            <property name="pattern" type="String" label="Pattern" />
+            <property name="count" type="Integer" label="Count" />
+            <property name="active" type="Boolean" label="Active" />
+            <property name="showHeader" type="Boolean" label="Show Header" />
+            <property name="goLive" type="String" label="Go Live Date (YYYY-MM-DD)" />
+            <property name="deadline" type="String" label="Deadline (ISO datetime)" />
+            <property name="priority" type="String" label="Priority" />
+            <property name="defaultOwner" type="String" label="Default Owner" />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Demo | Widgets Direct</masterLabel>
+    <description>Stress-test runtime LWC paired with a hand-rolled CPE that uses FieldPicker, WhereBuilder, OrderLimit directly (no Property Editor).</description>
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen" configurationEditor="c-demo-widgets-direct-cpe">
+            <property name="displayLabel" type="String" label="Label" default="Widgets Direct" />
+            <property name="sobjectApiName" type="String" label="SObject" default="Account" />
+            <property name="sortField" type="String" label="Sort Field" />
+            <property name="additionalFields" type="String" label="Additional Fields" />
+            <property name="whereClause" type="String" label="Where Clause" />
+            <property name="orderByField" type="String" label="Order By Field" />
+            <property name="orderByDirection" type="String" label="Order Direction" default="DESC" />
+            <property name="queryLimit" type="Integer" label="Query Limit" />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

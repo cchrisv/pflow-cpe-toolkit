@@ -2,8 +2,8 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>66.0</apiVersion>
     <isExposed>true</isExposed>
-    <masterLabel>Demo | Rating Field CPE (Builder Only)</masterLabel>
-    <description>Wrapper CPE for demoRatingField. Passes a schema to c-pflow-organism-property-editor. Do not drop directly onto a screen.</description>
+    <masterLabel>Demo | Widgets Direct CPE (Builder Only)</masterLabel>
+    <description>Hand-rolled CPE using FieldPicker, WhereBuilder, OrderLimit directly. Do not drop directly onto a screen.</description>
     <targets>
         <target>lightning__FlowScreen</target>
     </targets>

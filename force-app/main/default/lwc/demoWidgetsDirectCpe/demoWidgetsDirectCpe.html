@@ -1,0 +1,55 @@
+<template>
+    <div class="slds-p-around_small">
+        <lightning-input
+            label="SObject API Name"
+            value={_sobjectApiName}
+            onchange={handleSobjectChange}
+            class="slds-m-bottom_small"
+        ></lightning-input>
+
+        <div class="slds-m-bottom_medium">
+            <label class="slds-form-element__label">Single Field Picker</label>
+            <c-pflow-molecule-field-picker
+                label="Sort Field"
+                object-api-name={_sobjectApiName}
+                value={_sortField}
+                field-level-help="Single-select field picker — emits fieldchange."
+                onfieldchange={handleSortFieldChange}
+            ></c-pflow-molecule-field-picker>
+        </div>
+
+        <div class="slds-m-bottom_medium">
+            <label class="slds-form-element__label">Multi Field Picker (isMultiEntry)</label>
+            <c-pflow-molecule-field-picker
+                label="Additional Fields"
+                object-api-name={_sobjectApiName}
+                value={_additionalFields}
+                is-multi-entry="true"
+                field-level-help="Same component, isMultiEntry toggles pill-mode."
+                onchange={handleAdditionalFieldsChange}
+            ></c-pflow-molecule-field-picker>
+        </div>
+
+        <div class="slds-m-bottom_medium">
+            <label class="slds-form-element__label">Where Builder</label>
+            <c-pflow-organism-where-builder
+                object-api-name={_sobjectApiName}
+                value={_whereClause}
+                field-level-help="Visual WHERE clause \u2014 emits wherechange with parsed conditions."
+                onwherechange={handleWhereChange}
+            ></c-pflow-organism-where-builder>
+        </div>
+
+        <div>
+            <label class="slds-form-element__label">Order & Limit</label>
+            <c-pflow-molecule-order-limit
+                object-api-name={_sobjectApiName}
+                order-by-field={_orderByField}
+                order-by-direction={_orderByDirection}
+                query-limit={_queryLimit}
+                onorderchange={handleOrderChange}
+                onlimitchange={handleLimitChange}
+            ></c-pflow-molecule-order-limit>
+        </div>
+    </div>
+</template>
