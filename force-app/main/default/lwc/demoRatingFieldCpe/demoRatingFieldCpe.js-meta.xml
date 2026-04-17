@@ -2,9 +2,6 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>66.0</apiVersion>
     <isExposed>true</isExposed>
-    <masterLabel>Demo | Rating Field CPE (Builder Only)</masterLabel>
-    <description>Wrapper CPE for demoRatingField. Passes a schema to c-pflow-organism-property-editor. Not for runtime screens.</description>
-    <targets>
-        <target>lightning__FlowScreen</target>
-    </targets>
+    <masterLabel>Demo | Rating Field CPE</masterLabel>
+    <description>Wrapper CPE for demoRatingField. Referenced via configurationEditor; passes a schema to c-pflow-organism-property-editor. Not exposed to any lightning__* target.</description>
 </LightningComponentBundle>

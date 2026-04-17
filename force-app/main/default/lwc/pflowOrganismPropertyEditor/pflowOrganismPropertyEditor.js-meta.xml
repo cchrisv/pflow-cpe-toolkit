@@ -2,9 +2,6 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>66.0</apiVersion>
     <isExposed>true</isExposed>
-    <masterLabel>Professor Flow | CPE Property Editor (Builder Only)</masterLabel>
-    <description>Pluggable Custom Property Editor container for Flow Builder. Accepts a schema via @api prop and renders configuration UI for any consuming screen component. Each consuming LWC provides a thin wrapper CPE that passes its schema. Not for runtime screens.</description>
-    <targets>
-        <target>lightning__FlowScreen</target>
-    </targets>
+    <masterLabel>Professor Flow | CPE Property Editor</masterLabel>
+    <description>Pluggable CPE container. Referenced via configurationEditor from a wrapper CPE LWC; accepts a schema via @api and renders config UI. Not exposed to any lightning__* target.</description>
 </LightningComponentBundle>
