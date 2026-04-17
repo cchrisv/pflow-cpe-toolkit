@@ -1,0 +1,34 @@
+.cpe-root {
+    --cpe-gap: var(--slds-g-spacing_2, 0.5rem);
+    font-size: var(--slds-c-text-body-font-size, 0.8125rem);
+}
+
+.cpe-accordion {
+    --slds-c-accordion-summary-font-size: 0.8125rem;
+}
+
+.cpe-section-body {
+    padding-top: var(--cpe-gap);
+}
+
+.cpe-field {
+    max-width: 100%;
+}
+
+.cpe-toggle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--cpe-gap);
+    margin-top: var(--slds-g-spacing_3, 0.75rem);
+    padding-top: var(--slds-g-spacing_2, 0.5rem);
+    border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+}
+
+.cpe-toggle-cell {
+    min-width: 0;
+}
+
+.cpe-empty {
+    border-radius: var(--slds-g-radius-border-2, 0.25rem);
+    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}

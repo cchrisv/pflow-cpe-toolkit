@@ -1,0 +1,12 @@
+.cpe-ds-root {
+    max-width: 100%;
+}
+
+.cc-query-preview {
+    font-family: var(--lwc-fontFamilyMono, 'Courier New', monospace);
+    font-size: 0.75rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: var(--slds-g-color-neutral-base-30, #444);
+}

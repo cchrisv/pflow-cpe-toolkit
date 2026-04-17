@@ -1,0 +1,13 @@
+Professor Flow | CPE Toolkit
+Copyright 2026 Christiaan Van Der Merwe
+
+This product includes software developed by Eric Smith and the UnofficialSF community
+as part of the FlowScreenComponentsBasePack
+(https://github.com/UnofficialSF/LightningFlowComponents).
+
+Specifically, the following components incorporate code adapted from UnofficialSF:
+- pflow_cpeResourcePicker (adapted from fsc_flowPicker3)
+- pflow_cpeResourcePickerUtils (adapted from fsc_flowComboboxUtils)
+- pflow_cpeCheckbox (adapted from fsc_flowCheckbox)
+
+Original portions are licensed under the Apache License, Version 2.0.

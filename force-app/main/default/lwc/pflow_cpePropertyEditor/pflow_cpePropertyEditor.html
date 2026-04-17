@@ -1,0 +1,222 @@
+<template>
+    <template if:false={hasSchema}>
+        <div class="cpe-empty slds-p-around_small slds-text-body_small slds-text-color_weak">
+            Select a core Flow field or refresh — no schema matched this component.
+        </div>
+    </template>
+
+    <template if:true={hasSchema}>
+        <div class="cpe-root">
+            <lightning-accordion
+                allow-multiple-sections-open
+                active-section-name={activeSectionNames}
+                class="cpe-accordion"
+                onsectiontoggle={handleSectionToggle}
+            >
+                <template for:each={preparedSections} for:item="section">
+                    <lightning-accordion-section key={section.key} name={section.key} label={section.label}>
+                        <div class="cpe-section-body">
+                            <template lwc:if={section.hasComponent}>
+                                <template lwc:if={section.isCpeDataSource}>
+                                    <c-pflow-cpe-data-source
+                                        builder-context={builderContext}
+                                        automatic-output-variables={automaticOutputVariablesResolved}
+                                        input-values={cpeInputValues}
+                                        input-variables={inputVariablesResolved}
+                                        allowed-input-modes={section.allowedInputModesForCpe}
+                                        show-display-mode={section.showDisplayModeForCpe}
+                                        show-visual-card-options={section.showVisualCardOptionsForCpe}
+                                        picker-max-width={pickerMaxWidth}
+                                        ondatasourcechange={handleDataSourceChange}
+                                        class="slds-m-bottom_small"
+                                    ></c-pflow-cpe-data-source>
+                                </template>
+                            </template>
+
+                            <template for:each={section.regularProps} for:item="prop">
+                                <div key={prop.name} class="cpe-field slds-m-bottom_small">
+                                    <template if:true={prop.supportsResource}>
+                                        <c-pflow-cpe-resource-picker
+                                            name={prop.name}
+                                            label={prop.label}
+                                            required={prop.editorRequired}
+                                            value={prop.displayValue}
+                                            value-type={prop.pickerValueType}
+                                            builder-context={builderContext}
+                                            automatic-output-variables={automaticOutputVariablesResolved}
+                                            allow-hard-code-reference
+                                            max-width={pickerMaxWidth}
+                                            onvaluechanged={handleResourceValueChanged}
+                                        ></c-pflow-cpe-resource-picker>
+                                    </template>
+
+                                    <template if:false={prop.supportsResource}>
+                                        <template if:true={prop.hasPicklist}>
+                                            <lightning-combobox
+                                                data-prop-name={prop.name}
+                                                label={prop.label}
+                                                required={prop.editorRequired}
+                                                value={prop.displayValue}
+                                                options={prop.picklistOptions}
+                                                dropdown-alignment="bottom-left"
+                                                onchange={handleComboboxChange}
+                                            ></lightning-combobox>
+                                        </template>
+
+                                        <template if:false={prop.hasPicklist}>
+                                            <template if:true={prop.multiline}>
+                                                <lightning-textarea
+                                                    data-prop-name={prop.name}
+                                                    label={prop.label}
+                                                    required={prop.editorRequired}
+                                                    value={prop.displayValue}
+                                                    onchange={handleTextChange}
+                                                ></lightning-textarea>
+                                            </template>
+
+                                            <template if:false={prop.multiline}>
+                                                <template if:true={prop.isPatternField}>
+                                                    <lightning-combobox
+                                                        label="Common formats (no regex knowledge needed)"
+                                                        value={prop.patternPresetValue}
+                                                        options={prop.patternPresetOptions}
+                                                        dropdown-alignment="bottom-left"
+                                                        onchange={handlePatternPresetChange}
+                                                    ></lightning-combobox>
+                                                    <div
+                                                        class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-top_xx-small"
+                                                    >
+                                                        Pick one to fill the pattern automatically. Use Custom only if IT
+                                                        or a spec gave you an exact pattern.
+                                                    </div>
+                                                    <lightning-input
+                                                        class="slds-m-top_small"
+                                                        type="text"
+                                                        data-prop-name={prop.name}
+                                                        label={prop.label}
+                                                        placeholder={prop.placeholder}
+                                                        value={prop.displayValue}
+                                                        onchange={handleTextChange}
+                                                    ></lightning-input>
+                                                    <lightning-input
+                                                        class="slds-m-top_small"
+                                                        type="text"
+                                                        label="Try sample text"
+                                                        placeholder="Type what a user might enter"
+                                                        value={patternSampleText}
+                                                        onchange={handlePatternSampleChange}
+                                                    ></lightning-input>
+                                                    <template lwc:if={patternTryout.show}>
+                                                        <div class={patternTryout.className}>{patternTryout.text}</div>
+                                                    </template>
+                                                </template>
+
+                                                <template if:false={prop.isPatternField}>
+                                                    <template if:true={prop.isBoolean}>
+                                                        <lightning-input
+                                                            type="toggle"
+                                                            data-prop-name={prop.name}
+                                                            label={prop.label}
+                                                            checked={prop.checkedBool}
+                                                            message-toggle-active=""
+                                                            message-toggle-inactive=""
+                                                            onchange={handleBooleanToggleChange}
+                                                        ></lightning-input>
+                                                    </template>
+
+                                                    <template if:false={prop.isBoolean}>
+                                                        <template if:true={prop.isInteger}>
+                                                            <lightning-input
+                                                                type="number"
+                                                                step="1"
+                                                                data-prop-name={prop.name}
+                                                                label={prop.label}
+                                                                required={prop.editorRequired}
+                                                                value={prop.displayValue}
+                                                                onchange={handleIntegerChange}
+                                                            ></lightning-input>
+                                                        </template>
+
+                                                        <template if:false={prop.isInteger}>
+                                                            <template if:true={prop.isDate}>
+                                                                <lightning-input
+                                                                    type="date"
+                                                                    data-prop-name={prop.name}
+                                                                    label={prop.label}
+                                                                    required={prop.editorRequired}
+                                                                    value={prop.displayValue}
+                                                                    onchange={handleDateChange}
+                                                                ></lightning-input>
+                                                            </template>
+
+                                                            <template if:false={prop.isDate}>
+                                                                <template if:true={prop.isDateTime}>
+                                                                    <lightning-input
+                                                                        type="datetime"
+                                                                        data-prop-name={prop.name}
+                                                                        label={prop.label}
+                                                                        required={prop.editorRequired}
+                                                                        value={prop.displayValue}
+                                                                        onchange={handleDateTimeChange}
+                                                                    ></lightning-input>
+                                                                </template>
+
+                                                                <template if:false={prop.isDateTime}>
+                                                                    <lightning-input
+                                                                        type="text"
+                                                                        data-prop-name={prop.name}
+                                                                        label={prop.label}
+                                                                        placeholder={prop.placeholder}
+                                                                        required={prop.editorRequired}
+                                                                        value={prop.displayValue}
+                                                                        onchange={handleTextChange}
+                                                                    ></lightning-input>
+                                                                </template>
+                                                            </template>
+                                                        </template>
+                                                    </template>
+                                                </template>
+                                            </template>
+                                        </template>
+                                    </template>
+                                    <template lwc:if={prop.description}>
+                                        <div
+                                            class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-top_xx-small"
+                                        >
+                                            {prop.description}
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+
+                            <template if:true={section.compactBools.length}>
+                                <div class="cpe-toggle-grid">
+                                    <template for:each={section.compactBools} for:item="prop">
+                                        <div key={prop.name} class="cpe-toggle-cell">
+                                            <lightning-input
+                                                type="toggle"
+                                                data-prop-name={prop.name}
+                                                label={prop.label}
+                                                checked={prop.checkedBool}
+                                                message-toggle-active=""
+                                                message-toggle-inactive=""
+                                                onchange={handleBooleanToggleChange}
+                                            ></lightning-input>
+                                            <template lwc:if={prop.description}>
+                                                <div
+                                                    class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-top_xx-small"
+                                                >
+                                                    {prop.description}
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                    </lightning-accordion-section>
+                </template>
+            </lightning-accordion>
+        </div>
+    </template>
+</template>

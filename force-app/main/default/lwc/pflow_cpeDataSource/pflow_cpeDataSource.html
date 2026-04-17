@@ -1,0 +1,483 @@
+<template>
+    <div class="cpe-ds-root slds-form slds-form_stacked">
+        <template lwc:if={showDisplayMode}>
+            <lightning-combobox
+                label="Display Mode"
+                value={displayMode}
+                options={displayModeOptions}
+                dropdown-alignment="bottom-left"
+                data-name="displayMode"
+                onchange={handleDisplayModeChange}
+                class="slds-m-bottom_xx-small"
+            ></lightning-combobox>
+            <div class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                How choices render: picklist, radio group, or visual cards.
+            </div>
+        </template>
+
+        <template lwc:if={showInputModePicker}>
+            <lightning-combobox
+                label="Input Mode"
+                value={inputMode}
+                options={inputModeOptions}
+                dropdown-alignment="bottom-left"
+                onchange={handleInputModeChange}
+                class="slds-m-bottom_xx-small"
+            ></lightning-combobox>
+            <div class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                Collections, Salesforce picklist field, SOQL/SOSL dataset, or (Quick Choice) visual text box.
+            </div>
+        </template>
+
+        <template lwc:if={isSingleCollection}>
+            <c-pflow-cpe-resource-picker
+                name="choiceValues"
+                label="Choice Values (String Collection)"
+                field-level-help="One collection; label and value are the same for each entry."
+                required
+                value={dispChoiceValues}
+                value-type={pickerTypeChoiceValues}
+                builder-context={builderContext}
+                automatic-output-variables={automaticOutputVariables}
+                allow-hard-code-reference
+                max-width={pickerMaxWidth}
+                onvaluechanged={handleResourceChange}
+            ></c-pflow-cpe-resource-picker>
+        </template>
+
+        <template lwc:if={isDualCollection}>
+            <c-pflow-cpe-resource-picker
+                name="choiceLabels"
+                label="Choice Labels (String Collection)"
+                field-level-help="Labels shown to the user; indices must align with Choice Values."
+                required
+                value={dispChoiceLabels}
+                value-type={pickerTypeChoiceLabels}
+                builder-context={builderContext}
+                automatic-output-variables={automaticOutputVariables}
+                allow-hard-code-reference
+                max-width={pickerMaxWidth}
+                onvaluechanged={handleResourceChange}
+                class="slds-m-bottom_small"
+            ></c-pflow-cpe-resource-picker>
+            <c-pflow-cpe-resource-picker
+                name="choiceValues"
+                label="Choice Values (String Collection)"
+                field-level-help="Stored values; same order and length as Choice Labels."
+                required
+                value={dispChoiceValues}
+                value-type={pickerTypeChoiceValues}
+                builder-context={builderContext}
+                automatic-output-variables={automaticOutputVariables}
+                allow-hard-code-reference
+                max-width={pickerMaxWidth}
+                onvaluechanged={handleResourceChange}
+            ></c-pflow-cpe-resource-picker>
+        </template>
+
+        <template lwc:if={isPicklistField}>
+            <c-pflow-cpe-custom-lookup
+                lwc:ref="objectLookup"
+                label="Object API Name"
+                field-level-help="Object that owns the picklist used to build choice options."
+                placeholder="Search objects…"
+                variant="label-stacked"
+                selection={objectLookupSelection}
+                required
+                min-search-term-length="0"
+                scroll-after-n-items="7"
+                onsearch={handleObjectLookupSearch}
+                onselectionchange={handleObjectLookupSelectionChange}
+                class="slds-m-bottom_small"
+            ></c-pflow-cpe-custom-lookup>
+            <c-pflow-cpe-field-picker
+                label="Field API Name (picklists on selected object)"
+                field-level-help="Picklist or dependent picklist field on the selected object."
+                placeholder="Search picklist fields…"
+                object-api-name={objectNameTrimmedVal}
+                value={dispFieldName}
+                field-type-filter="PICKLIST,MULTIPICKLIST,COMBOBOX"
+                disabled={fieldLookupDisabled}
+                required
+                onfieldchange={handlePicklistFieldPickerChange}
+                class="slds-m-bottom_small"
+            ></c-pflow-cpe-field-picker>
+            <lightning-combobox
+                label="Record Type"
+                value={recordTypeComboboxValue}
+                options={recordTypeComboboxOptions}
+                disabled={recordTypeComboboxDisabled}
+                dropdown-alignment="bottom-left"
+                onchange={handleRecordTypeComboboxChange}
+                class="slds-m-bottom_xx-small"
+            ></lightning-combobox>
+            <div class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                Record types from metadata for the selected object (Flow configuration editor–safe). None uses the
+                runtime default (master).
+            </div>
+            <lightning-input
+                label="Record type Id override (merge field)"
+                value={dispRecordTypeId}
+                data-name="recordTypeId"
+                placeholder="Optional: \{!...} or Id if not choosing from the list"
+                onchange={handleTextChange}
+                class="slds-m-bottom_xx-small"
+            ></lightning-input>
+            <div class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                Flow references or raw Ids override the combobox when they are not in the list above.
+            </div>
+            <lightning-input
+                type="toggle"
+                label="Dependent picklist"
+                checked={toggledDependent}
+                data-name="isDependentPicklist"
+                message-toggle-active=""
+                message-toggle-inactive=""
+                onchange={handleBooleanChange}
+                class="slds-m-bottom_xx-small"
+            ></lightning-input>
+            <div class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                Restrict options using the controlling field and its selected value.
+            </div>
+            <template lwc:if={toggledDependent}>
+                <c-pflow-cpe-custom-lookup
+                    lwc:ref="controllingPicklistLookup"
+                    label="Controlling Value (Picklist)"
+                    field-level-help="Controlling picklist entry that gates which dependent values are available."
+                    placeholder="Search controlling picklist values…"
+                    variant="label-stacked"
+                    selection={controllingPicklistLookupSelection}
+                    disabled={controllingPicklistLookupDisabled}
+                    min-search-term-length="0"
+                    scroll-after-n-items="7"
+                    onsearch={handleControllingPicklistLookupSearch}
+                    onselectionchange={handleControllingPicklistLookupSelectionChange}
+                    class="slds-m-bottom_small"
+                ></c-pflow-cpe-custom-lookup>
+                <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_x-small">{controllingPicklistLookupHelp}</p>
+                <lightning-input
+                    label="Controlling value override (API / merge field)"
+                    value={dispControllingValuePicklist}
+                    data-name="controllingValuePicklist"
+                    placeholder="\{!$Record.Field} or raw API value"
+                    onchange={handleTextChange}
+                    class="slds-m-bottom_xx-small"
+                ></lightning-input>
+                <div class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                    Optional. Use for Flow references; replaces the search selection above when you type here.
+                </div>
+                <c-pflow-cpe-resource-picker
+                    name="controllingValueCheckbox"
+                    label="Controlling Value (Checkbox)"
+                    field-level-help="Boolean controlling field value for metadata-driven dependent picklists."
+                    value={dispControllingValueCheckbox}
+                    value-type={pickerTypeControllingCheckbox}
+                    builder-context={builderContext}
+                    automatic-output-variables={automaticOutputVariables}
+                    allow-hard-code-reference
+                    max-width={pickerMaxWidth}
+                    onvaluechanged={handleResourceChange}
+                    class="slds-m-bottom_small"
+                ></c-pflow-cpe-resource-picker>
+            </template>
+            <lightning-input
+                type="toggle"
+                label="Allow None"
+                checked={toggledAllowNone}
+                data-name="allowNone"
+                message-toggle-active=""
+                message-toggle-inactive=""
+                onchange={handleBooleanChange}
+                class="slds-m-bottom_xx-small"
+            ></lightning-input>
+            <div class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                When enabled, adds a blank / None option at the top of the list.
+            </div>
+            <lightning-input
+                type="toggle"
+                label="Sort by label"
+                checked={toggledSortList}
+                data-name="sortList"
+                message-toggle-active=""
+                message-toggle-inactive=""
+                onchange={handleBooleanChange}
+                class="slds-m-bottom_xx-small"
+            ></lightning-input>
+            <div class="slds-form-element__help slds-text-body_small slds-text-color_weak">
+                When enabled, sort picklist options alphabetically by label.
+            </div>
+        </template>
+
+        <template lwc:if={isDatasetSoqlOrSosl}>
+            <div class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                SOQL returns a browseable list (LIKE on the display field when the user types). SOSL uses indexed search
+                (requires at least two characters in the runtime search box).
+            </div>
+
+            <!-- Object picker (unchanged — uses Apex searchSObjectTypes) -->
+            <c-pflow-cpe-custom-lookup
+                lwc:ref="datasetObjectLookup"
+                label="Object API Name"
+                field-level-help="SObject searched at runtime."
+                placeholder="Search objects…"
+                variant="label-stacked"
+                selection={datasetObjectLookupSelection}
+                required
+                min-search-term-length="0"
+                scroll-after-n-items="7"
+                onsearch={handleDatasetObjectLookupSearch}
+                onselectionchange={handleDatasetObjectLookupSelectionChange}
+                class="slds-m-bottom_small"
+            ></c-pflow-cpe-custom-lookup>
+
+            <!-- Field pickers (same pattern as object picker — direct lookup + Apex search) -->
+            <c-pflow-cpe-custom-lookup
+                lwc:ref="datasetDisplayFieldLookup"
+                label="Display Field"
+                field-level-help="Primary column in results; SOQL search uses LIKE on this field (text-like fields work best)."
+                placeholder="Search fields…"
+                variant="label-stacked"
+                selection={datasetDisplayFieldLookupSelection}
+                disabled={datasetFieldLookupDisabled}
+                required
+                min-search-term-length="0"
+                scroll-after-n-items="7"
+                onsearch={handleDatasetFieldSearch}
+                onselectionchange={handleDatasetDisplayFieldSelectionChange}
+                class="slds-m-bottom_small"
+            ></c-pflow-cpe-custom-lookup>
+
+            <c-pflow-cpe-custom-lookup
+                lwc:ref="datasetSubtitleFieldLookup"
+                label="Subtitle Field"
+                field-level-help="Optional secondary line under each result."
+                placeholder="Search fields…"
+                variant="label-stacked"
+                selection={datasetSubtitleFieldLookupSelection}
+                disabled={datasetFieldLookupDisabled}
+                min-search-term-length="0"
+                scroll-after-n-items="7"
+                onsearch={handleDatasetFieldSearch}
+                onselectionchange={handleDatasetSubtitleFieldSelectionChange}
+                class="slds-m-bottom_small"
+            ></c-pflow-cpe-custom-lookup>
+
+            <c-pflow-cpe-custom-lookup
+                lwc:ref="datasetValueFieldLookup"
+                label="Value Field"
+                field-level-help="Field stored as the output (usually Id or an external-id text field)."
+                placeholder="Search fields…"
+                variant="label-stacked"
+                selection={datasetValueFieldLookupSelection}
+                disabled={datasetFieldLookupDisabled}
+                required
+                min-search-term-length="0"
+                scroll-after-n-items="7"
+                onsearch={handleDatasetFieldSearch}
+                onselectionchange={handleDatasetValueFieldSelectionChange}
+                class="slds-m-bottom_small"
+            ></c-pflow-cpe-custom-lookup>
+
+            <c-pflow-cpe-custom-lookup
+                lwc:ref="datasetAdditionalFieldsLookup"
+                label="Additional Fields"
+                field-level-help="Fields included in the SELECT (optional)."
+                placeholder="Search fields…"
+                variant="label-stacked"
+                is-multi-entry
+                selection={datasetAdditionalFieldsSelection}
+                disabled={datasetFieldLookupDisabled}
+                min-search-term-length="0"
+                scroll-after-n-items="7"
+                onsearch={handleDatasetFieldSearch}
+                onselectionchange={handleDatasetAdditionalFieldsSelectionChange}
+                class="slds-m-bottom_small"
+            ></c-pflow-cpe-custom-lookup>
+
+            <!-- WHERE clause (SOQL only) -->
+            <template lwc:if={isDatasetSoql}>
+                <div class="slds-m-top_small slds-p-top_small slds-border_top">
+                    <div class="slds-grid slds-grid_align-spread slds-m-bottom_x-small">
+                        <span class="slds-text-title_caps slds-text-color_weak">Where Clause</span>
+                        <lightning-button-group>
+                            <lightning-button
+                                label="Visual"
+                                variant={whereVisualVariant}
+                                onclick={handleWhereToggleVisual}
+                            ></lightning-button>
+                            <lightning-button
+                                label="Raw"
+                                variant={whereRawVariant}
+                                onclick={handleWhereToggleRaw}
+                            ></lightning-button>
+                        </lightning-button-group>
+                    </div>
+                    <template lwc:if={isWhereVisualMode}>
+                        <c-pflow-cpe-where-builder
+                            object-api-name={datasetObjectApiNameTrimmedVal}
+                            value={dispWhereClause}
+                            disabled={datasetFieldLookupDisabled}
+                            builder-context={builderContext}
+                            automatic-output-variables={automaticOutputVariables}
+                            max-width={pickerMaxWidth}
+                            onchange={handleWhereClauseChange}
+                        ></c-pflow-cpe-where-builder>
+                    </template>
+                    <template lwc:if={isWhereRawMode}>
+                        <lightning-textarea
+                            label="WHERE clause (raw SOQL)"
+                            value={dispWhereClause}
+                            placeholder="e.g. Industry = 'Technology' AND AnnualRevenue > 1000000"
+                            variant="label-hidden"
+                            onchange={handleWhereClauseChange}
+                        ></lightning-textarea>
+                        <div class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-top_xx-small">
+                            Raw SOQL WHERE clause (omit WHERE keyword). Merge fields supported.
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <!-- ORDER BY + LIMIT -->
+            <div class="slds-m-top_small slds-p-top_small slds-border_top">
+                <span class="slds-text-title_caps slds-text-color_weak slds-m-bottom_x-small slds-show">Order &amp; Limit</span>
+                <c-pflow-cpe-order-limit
+                    object-api-name={datasetObjectApiNameTrimmedVal}
+                    order-by-field={dispOrderByField}
+                    order-by-direction={dispOrderByDirection}
+                    query-limit={dispQueryLimit}
+                    disabled={datasetFieldLookupDisabled}
+                    onorderchange={handleOrderChange}
+                    onlimitchange={handleLimitChange}
+                ></c-pflow-cpe-order-limit>
+            </div>
+
+            <!-- Query preview + Validate -->
+            <div class="slds-m-top_small slds-p-top_small slds-border_top">
+                <span class="slds-text-title_caps slds-text-color_weak slds-m-bottom_x-small slds-show">Query Preview</span>
+                <pre class="cc-query-preview slds-box slds-box_x-small slds-theme_shade slds-text-body_small slds-m-bottom_small">{generatedSoqlPreview}</pre>
+                <lightning-button
+                    variant="neutral"
+                    label="Validate"
+                    title="Runs a server check against the query configuration."
+                    disabled={datasetValidateButtonDisabled}
+                    onclick={handleDatasetValidate}
+                ></lightning-button>
+                <template lwc:if={datasetValidationSummary}>
+                    <p class={datasetValidationSummaryClass}>
+                        {datasetValidationSummary}
+                    </p>
+                </template>
+            </div>
+        </template>
+
+        <template lwc:if={isVisualTextBox}>
+            <c-pflow-cpe-resource-picker
+                name="choiceLabels"
+                label="Choice Titles (Labels)"
+                field-level-help="Titles shown on each visual card; pair by index with descriptions."
+                required
+                value={dispChoiceLabels}
+                value-type={pickerTypeChoiceLabels}
+                builder-context={builderContext}
+                automatic-output-variables={automaticOutputVariables}
+                allow-hard-code-reference
+                max-width={pickerMaxWidth}
+                onvaluechanged={handleResourceChange}
+                class="slds-m-bottom_small"
+            ></c-pflow-cpe-resource-picker>
+            <c-pflow-cpe-resource-picker
+                name="choiceValues"
+                label="Choice Descriptions (Values)"
+                field-level-help="Body text under each title; plain or rich HTML when rich text is enabled."
+                required
+                value={dispChoiceValues}
+                value-type={pickerTypeChoiceValues}
+                builder-context={builderContext}
+                automatic-output-variables={automaticOutputVariables}
+                allow-hard-code-reference
+                max-width={pickerMaxWidth}
+                onvaluechanged={handleResourceChange}
+                class="slds-m-bottom_small"
+            ></c-pflow-cpe-resource-picker>
+            <template lwc:if={showVisualFields}>
+                <c-pflow-cpe-resource-picker
+                    name="choiceIcons"
+                    label="Choice Icons / Images"
+                    field-level-help="utility:icon name or image file in static resource."
+                    value={dispChoiceIcons}
+                    value-type={pickerTypeChoiceIcons}
+                    builder-context={builderContext}
+                    automatic-output-variables={automaticOutputVariables}
+                    allow-hard-code-reference
+                    max-width={pickerMaxWidth}
+                    onvaluechanged={handleResourceChange}
+                    class="slds-m-bottom_small"
+                ></c-pflow-cpe-resource-picker>
+                <lightning-input
+                    type="toggle"
+                    label="Include icons in display"
+                    checked={toggledIncludeIcons}
+                    data-name="includeIcons"
+                    message-toggle-active=""
+                    message-toggle-inactive=""
+                    onchange={handleBooleanChange}
+                    class="slds-m-bottom_xx-small"
+                ></lightning-input>
+                <div class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                    Show utility or image icons from Choice Icons when data is provided.
+                </div>
+                <lightning-combobox
+                    label="Icon size"
+                    value={dispIconSize}
+                    options={iconSizeOptions}
+                    data-name="iconSize"
+                    dropdown-alignment="bottom-left"
+                    onchange={handleComboboxChange}
+                    class="slds-m-bottom_xx-small"
+                ></lightning-combobox>
+                <div class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                    Relative size of icons in the visual layout.
+                </div>
+                <lightning-combobox
+                    label="Number of columns"
+                    value={dispNumberOfColumns}
+                    options={columnOptions}
+                    data-name="numberOfColumns"
+                    dropdown-alignment="bottom-left"
+                    onchange={handleComboboxChange}
+                    class="slds-m-bottom_xx-small"
+                ></lightning-combobox>
+                <div class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                    How many cards appear per row in the grid.
+                </div>
+                <lightning-input
+                    type="toggle"
+                    label="Responsive card width (single column)"
+                    checked={toggledMakeResponsive}
+                    data-name="makeResponsive"
+                    message-toggle-active=""
+                    message-toggle-inactive=""
+                    onchange={handleBooleanChange}
+                    class="slds-m-bottom_xx-small"
+                ></lightning-input>
+                <div class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                    On narrow viewports, stack cards in a single full-width column.
+                </div>
+                <lightning-input
+                    type="toggle"
+                    label="Rich text descriptions"
+                    checked={toggledUseRichText}
+                    data-name="useRichText"
+                    message-toggle-active=""
+                    message-toggle-inactive=""
+                    onchange={handleBooleanChange}
+                    class="slds-m-bottom_xx-small"
+                ></lightning-input>
+                <div class="slds-form-element__help slds-text-body_small slds-text-color_weak">
+                    Render description strings as HTML instead of plain text.
+                </div>
+            </template>
+        </template>
+    </div>
+</template>

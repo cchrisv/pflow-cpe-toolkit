@@ -1,0 +1,105 @@
+<template>
+    <!-- Logic operator (only when 2+ conditions) -->
+    <template lwc:if={showLogic}>
+        <lightning-combobox
+            label="Logic"
+            value={logicOperator}
+            options={logicOptions}
+            variant="label-inline"
+            disabled={disabled}
+            onchange={handleLogicChange}
+            class="slds-m-bottom_x-small"
+        ></lightning-combobox>
+    </template>
+
+    <!-- Condition rows -->
+    <div class="cc-where-conditions">
+        <template for:each={conditionRows} for:item="row">
+            <div key={row.id} class="cc-where-row slds-box slds-box_x-small slds-m-bottom_x-small slds-theme_shade">
+                <!-- Row 1: Field + remove -->
+                <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-end">
+                    <div class="slds-col slds-grow">
+                        <c-pflow-cpe-custom-lookup
+                            label="Field"
+                            placeholder="Search fields..."
+                            variant="label-stacked"
+                            selection={row.fieldSelection}
+                            disabled={disabled}
+                            min-search-term-length="0"
+                            scroll-after-n-items="5"
+                            data-index={row.index}
+                            onsearch={handleFieldSearch}
+                            onselectionchange={handleFieldSelectionChange}
+                        ></c-pflow-cpe-custom-lookup>
+                    </div>
+                    <template lwc:if={row.removable}>
+                        <div class="slds-col slds-shrink-none slds-m-left_xx-small">
+                            <lightning-button-icon
+                                icon-name="utility:delete"
+                                alternative-text="Remove condition"
+                                variant="bare"
+                                size="small"
+                                data-index={row.index}
+                                onclick={handleRemoveCondition}
+                                disabled={disabled}
+                            ></lightning-button-icon>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Row 2: Operator + Value -->
+                <div class="slds-grid slds-m-top_xx-small slds-gutters_xx-small">
+                    <div class="slds-col slds-size_4-of-12">
+                        <lightning-combobox
+                            label="Op"
+                            value={row.operator}
+                            options={row.operatorOptions}
+                            disabled={disabled}
+                            data-index={row.index}
+                            onchange={handleOperatorChange}
+                            variant="label-hidden"
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_8-of-12">
+                        <template lwc:if={row.isBooleanValue}>
+                            <lightning-combobox
+                                label="Value"
+                                value={row.value}
+                                options={row.booleanOptions}
+                                placeholder="Select..."
+                                disabled={disabled}
+                                data-index={row.index}
+                                onchange={handleValueChange}
+                                variant="label-hidden"
+                            ></lightning-combobox>
+                        </template>
+                        <template lwc:else>
+                            <c-pflow-cpe-resource-picker
+                                name={row.valueName}
+                                label="Value"
+                                value={row.value}
+                                value-type="reference"
+                                builder-context={builderContext}
+                                automatic-output-variables={automaticOutputVariables}
+                                allow-hard-code-reference
+                                max-width={maxWidth}
+                                data-index={row.index}
+                                onvaluechanged={handleResourceValueChange}
+                            ></c-pflow-cpe-resource-picker>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <!-- Add condition -->
+    <lightning-button
+        label="Add Condition"
+        icon-name="utility:add"
+        variant="base"
+        onclick={handleAddCondition}
+        disabled={disabled}
+        class="slds-m-top_xx-small"
+    ></lightning-button>
+</template>

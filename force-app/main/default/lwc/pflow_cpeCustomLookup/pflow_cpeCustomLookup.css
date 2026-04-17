@@ -1,0 +1,31 @@
+/* Dropdown: absolute overlay, full width, above surrounding content */
+.cc-lookup__dropdown {
+    position: absolute;
+    margin-top: var(--slds-g-spacing-xx-small, 0.25rem);
+    width: 100%;
+    z-index: 7001;
+}
+
+/* Centered state rows (loading spinner, no-results) */
+.cc-lookup__state {
+    min-height: var(--slds-g-sizing-9, 2rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Search term highlight */
+.cc-mark {
+    background-color: var(--slds-g-color-neutral-base-95, rgba(243, 243, 243, 1));
+    color: inherit;
+}
+
+/* Anchor for absolute-positioned dropdown */
+.slds-combobox {
+    position: relative;
+}
+
+/* Single-select with selection: left-pad input for entity icon */
+.slds-combobox__input-value {
+    padding-left: 2rem;
+}

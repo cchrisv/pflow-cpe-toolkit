@@ -1,0 +1,20 @@
+<template>
+    <div class={cbClass}>
+        <lightning-input
+            type="toggle"
+            label={label}
+            name={name}
+            data-name={name}
+            message-toggle-active=""
+            message-toggle-inactive=""
+            checked={isChecked}
+            disabled={disabled}
+            onchange={handleCheckboxChange}
+        ></lightning-input>
+        <template lwc:if={fieldLevelHelp}>
+            <div class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-top_xx-small">
+                {fieldLevelHelp}
+            </div>
+        </template>
+    </div>
+</template>

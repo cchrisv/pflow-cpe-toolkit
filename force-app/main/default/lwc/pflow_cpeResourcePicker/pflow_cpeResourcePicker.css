@@ -1,0 +1,34 @@
+div input[readonly] {
+    padding-left: 1.75rem !important;
+}
+
+.slds-input {
+    padding-left: 1.75rem !important;
+}
+
+.slds-input-has-icon .slds-input__icon {
+    top: 56% !important;
+}
+
+.slds-icon_small,
+.slds-icon--small {
+    width: 1.5rem;
+    height: 1.5rem;
+    line-height: 2;
+    fill: white;
+}
+
+.custom-text-transform_uppercase {
+    text-transform: uppercase;
+}
+
+.custom-width-full {
+    width: 100%;
+}
+
+/* Standard SLDS pill (not bare): center in combobox row, allow wrapping for long merge field paths */
+.cpe-picker-pill-wrap {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0.125rem 0;
+}
