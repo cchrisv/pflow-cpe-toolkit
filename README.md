@@ -2,11 +2,11 @@
 
 Reusable building blocks for Salesforce Flow **Custom Property Editors (CPEs)** — field pickers, a visual WHERE-clause builder, flow-resource picker, data-source selector, searchable lookup, validation mixin, and a shared field-metadata cache.
 
-Drop these into your own CPE LWC and skip the boilerplate. **Zero of the pack's 9 widget components appear in the Flow screen palette** — they're all internal-use LWCs (`isExposed=false`) consumed by your hand-written CPE.
+Drop these into your own CPE LWC and skip the boilerplate. **None of the pack's 9 widget components appear in the Flow screen palette** — they're all `isExposed=false`, used only from inside your CPE LWC.
 
-> **Unavoidable caveat:** the CPE LWC *you* write for *your* runtime component will appear in the Flow screen palette. That's the Salesforce LWC spec — any LWC referenced by `configurationEditor` must have `<target>lightning__FlowScreen</target>` + `<isExposed>true</isExposed>`, and that combination puts it in the palette. The accepted industry convention is to prefix the masterLabel with `_` (sorts to bottom) and add `(Builder Only)` to warn admins not to drop it directly.
+> **Caveat:** the CPE LWC *you* write for *your* runtime component will appear in the palette. That's the Salesforce LWC spec — any LWC referenced by `configurationEditor` must have `<target>lightning__FlowScreen</target>` + `<isExposed>true</isExposed>`, which forces palette exposure. The accepted convention is to prefix its masterLabel with `_` (sorts to bottom) and add `(Builder Only)` to warn admins.
 
-## What's included (v1.0) — 9 pack LWCs + 1 Apex controller + 1 reference demo
+## What's included — 9 LWCs + 1 Apex controller
 
 ### Atom
 
@@ -33,25 +33,13 @@ Drop these into your own CPE LWC and skip the boilerplate. **Zero of the pack's 
 
 - **`PFlowCpeChoiceEngineController`** + **`PFlowCpeChoiceEngineControllerTest`** — Unified `@AuraEnabled` API: object/field describe, SOQL/SOSL search, picklist values, record-type options, configuration validation. All dynamic SOQL enforces `AccessLevel.USER_MODE`. 37 tests, 81% coverage.
 
-### Reference demo (optional — not part of the core pack)
-
-- **`demoWidgetsDirect`** + **`_ demoWidgetsDirectCpe`** — a runtime component that renders a summary of its configured values, paired with a hand-rolled CPE that composes every widget. Use as a copy-paste starting point for your own CPE LWC.
-
 ## Install
-
-Clone and deploy:
 
 ```bash
 sf project deploy start -d force-app -o <org-alias>
 ```
 
 (Unmanaged package URLs will be published after the first package build.)
-
-## Architecture
-
-The toolkit ships **pure reusable widgets**. Every pack LWC has `isExposed=false` so none of them clutter the Flow screen palette. You write your own CPE LWC (one per runtime component) and drop our widgets into its template.
-
-**Why no shared PropertyEditor?** A shared schema-driven CPE either requires a merge-conflict-magnet `schemaData.js` file (coreFlow's original pattern) or forces each consumer to ship a wrapper CPE that appears in the palette. Neither scales. Hand-rolled CPEs give you full control over layout, validation, and conditional visibility with minimal boilerplate when the widgets handle the hard parts.
 
 ## Quick start — build a CPE for your own Flow screen component
 
@@ -123,13 +111,12 @@ export default class MyRatingFieldCpe extends LightningElement {
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>66.0</apiVersion>
   <isExposed>true</isExposed>
+  <masterLabel>_ My Rating Field CPE (Builder Only)</masterLabel>
   <targets>
     <target>lightning__FlowScreen</target>
   </targets>
 </LightningComponentBundle>
 ```
-
-Your CPE will appear in the palette (one per runtime component) — that's unavoidable for LWC CPEs per the Salesforce spec. Prefix its master label with `_` to sort it to the bottom and add `(Builder Only)` to warn users.
 
 ### 3. Extend the validation mixin in your runtime LWC
 
@@ -147,16 +134,9 @@ export default class MyRatingField extends FlowValidationMixin(LightningElement)
 }
 ```
 
-## Working demo
+## Reference demo
 
-The repo includes a reference implementation in `force-app/main/default/lwc/demoWidgetsDirect*` — a runtime component that renders a summary of its configured values (SObject, sort field, additional fields, WHERE clause, order + limit) paired with a hand-rolled CPE that exercises every widget in the toolkit:
-
-- `c-pflow-molecule-custom-lookup` wired to `searchSObjectTypes` (SObject picker)
-- `c-pflow-molecule-field-picker` in single and multi modes
-- `c-pflow-organism-where-builder`
-- `c-pflow-molecule-order-limit`
-
-Deploy the pack + demo, drop **Demo | Widgets Direct** onto a Flow screen, and the full pattern renders end-to-end. The wrapper CPE is underscore-prefixed (`_ Demo | Widgets Direct CPE`) so it sorts to the bottom of the palette out of the way of the runtime component.
+A copy-paste starting point lives in [`examples/lwc/`](examples/) — a runtime component that renders a summary of its configured values, paired with a hand-rolled CPE that composes every widget. See [`examples/README.md`](examples/README.md) for details on deploying it separately.
 
 ## License
 
