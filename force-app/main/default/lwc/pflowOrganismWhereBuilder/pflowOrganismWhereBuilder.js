@@ -54,7 +54,7 @@ const OPS_REFERENCE = [
     { label: 'NOT IN', value: 'NOT IN' }
 ];
 
-function operatorsForType(fieldType) {
+export function operatorsForType(fieldType) {
     const t = (fieldType || '').toUpperCase();
     switch (t) {
         case 'STRING':
@@ -107,7 +107,7 @@ function escapeString(s) {
     return String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 }
 
-function serializeValue(raw, fieldType, operator) {
+export function serializeValue(raw, fieldType, operator) {
     const t = (fieldType || '').toUpperCase();
     const op = (operator || '').toUpperCase();
 
@@ -146,7 +146,7 @@ function serializeValue(raw, fieldType, operator) {
     return "'" + escapeString(raw) + "'";
 }
 
-function serializeConditions(conditions, logic) {
+export function serializeConditions(conditions, logic) {
     const parts = [];
     for (const c of conditions) {
         if (!c.field || !c.operator || (c.value === '' && c.value !== 0)) {
@@ -161,7 +161,7 @@ function serializeConditions(conditions, logic) {
 
 // ── Parsing (best-effort) ────────────────────────────────────
 
-function parseWhereClause(str) {
+export function parseWhereClause(str) {
     if (!str || !str.trim()) {
         return { conditions: [], logic: 'AND' };
     }
