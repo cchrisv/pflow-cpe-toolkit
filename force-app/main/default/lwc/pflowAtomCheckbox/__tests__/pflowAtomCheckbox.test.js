@@ -47,34 +47,19 @@ describe('c-pflow-atom-checkbox', () => {
         });
     });
 
-    it('fires checkboxchanged with the Flow CPE detail shape when toggled on', () => {
+    it('fires checkboxchanged with CB_TRUE when the underlying toggle emits checked=true', () => {
         const el = mount({ name: 'enableThing' });
         const handler = jest.fn();
         el.addEventListener('checkboxchanged', handler);
 
         const input = el.shadowRoot.querySelector('lightning-input');
-        input.dispatchEvent(
-            new CustomEvent('change', { detail: { checked: true } }),
-        );
-        // lightning-input stubs: simulate by firing the component's handler directly
-        el.shadowRoot
-            .querySelector('lightning-input')
-            .dispatchEvent(
-                new CustomEvent('change', {
-                    bubbles: true,
-                    composed: true,
-                }),
-            );
+        // Simulate the lightning-input change event with a target carrying the Flow-CPE shape.
+        Object.defineProperty(input, 'checked', { value: true, configurable: true });
+        Object.defineProperty(input, 'name', { value: 'enableThing', configurable: true });
+        input.dispatchEvent(new CustomEvent('change'));
 
-        // Invoke the public handler with a synthetic event shape:
-        const syntheticEvt = {
-            target: { name: 'enableThing', checked: true }
-        };
-        el.handleCheckboxChange?.(syntheticEvt);
-
-        expect(handler).toHaveBeenCalled();
-        const { detail } = handler.mock.calls[0][0];
-        expect(detail).toEqual({
+        expect(handler).toHaveBeenCalledTimes(1);
+        expect(handler.mock.calls[0][0].detail).toEqual({
             id: 'enableThing',
             newValue: true,
             newValueDataType: 'Boolean',
@@ -82,25 +67,28 @@ describe('c-pflow-atom-checkbox', () => {
         });
     });
 
-    it('fires with CB_FALSE when toggled off', () => {
+    it('fires with CB_FALSE when the underlying toggle emits checked=false', () => {
         const el = mount({ name: 'enableThing', checked: true });
         const handler = jest.fn();
         el.addEventListener('checkboxchanged', handler);
 
-        el.handleCheckboxChange?.({
-            target: { name: 'enableThing', checked: false }
-        });
+        const input = el.shadowRoot.querySelector('lightning-input');
+        Object.defineProperty(input, 'checked', { value: false, configurable: true });
+        Object.defineProperty(input, 'name', { value: 'enableThing', configurable: true });
+        input.dispatchEvent(new CustomEvent('change'));
 
         expect(handler).toHaveBeenCalledTimes(1);
         expect(handler.mock.calls[0][0].detail.newStringValue).toBe('CB_FALSE');
     });
 
-    it('renders fieldLevelHelp text when provided', () => {
-        const el = mount({ fieldLevelHelp: 'Toggle to enable the border' });
+    it('passes fieldLevelHelp through to lightning-input as native field-level-help (tooltip)', () => {
+        const help = 'Toggle to enable the border';
+        const el = mount({ fieldLevelHelp: help });
         return Promise.resolve().then(() => {
-            const help = el.shadowRoot.querySelector('.slds-form-element__help');
-            expect(help).not.toBeNull();
-            expect(help.textContent.trim()).toBe('Toggle to enable the border');
+            const input = el.shadowRoot.querySelector('lightning-input');
+            expect(input.fieldLevelHelp).toBe(help);
+            // Also verify we no longer render a legacy static help div.
+            expect(el.shadowRoot.querySelector('.slds-form-element__help')).toBeNull();
         });
     });
 
