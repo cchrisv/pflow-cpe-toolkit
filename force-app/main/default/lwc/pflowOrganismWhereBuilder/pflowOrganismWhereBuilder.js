@@ -262,9 +262,14 @@ export default class PflowOrganismWhereBuilder extends LightningElement {
         const next = v == null ? '' : String(v);
         if (next === this._value) return;
         this._value = next;
-        if (!this._initialized) {
-            this._initFromValue();
+        // Always re-parse — external assignment must update the visible rows
+        // even after the component has initialized. Skip when the change
+        // came from our own _emitChange (sentinel guard below).
+        if (this._suppressReparse) {
+            this._suppressReparse = false;
+            return;
         }
+        this._initFromValue();
     }
 
     get logicOptions() {
@@ -477,7 +482,24 @@ export default class PflowOrganismWhereBuilder extends LightningElement {
             _fieldType: this._resolveFieldType(c.field) || c._fieldType
         }));
         const soql = serializeConditions(withTypes, this.logicOperator);
-        this._value = soql;
+        // Suppress the next re-parse cycle: our own emit shouldn't rebuild the rows.
+        if (soql !== this._value) {
+            this._suppressReparse = true;
+            this._value = soql;
+        }
         this.dispatchEvent(new CustomEvent('change', { detail: { value: soql || null } }));
+    }
+
+    /** Render-time SOQL preview. Empty when no complete conditions yet. */
+    get previewSoql() {
+        const withTypes = this.conditions.map((c) => ({
+            ...c,
+            _fieldType: this._resolveFieldType(c.field) || c._fieldType
+        }));
+        return serializeConditions(withTypes, this.logicOperator);
+    }
+
+    get hasPreviewSoql() {
+        return Boolean(this.previewSoql);
     }
 }

@@ -48,19 +48,19 @@
                 </div>
 
                 <!-- Row 2: Operator + Value -->
-                <div class="slds-grid slds-m-top_xx-small slds-gutters_xx-small">
-                    <div class="slds-col slds-size_4-of-12">
+                <div class="slds-grid slds-m-top_x-small slds-gutters_xx-small">
+                    <div class="slds-col slds-size_5-of-12">
                         <lightning-combobox
-                            label="Op"
+                            label="Operator"
                             value={row.operator}
                             options={row.operatorOptions}
                             disabled={disabled}
                             data-index={row.index}
                             onchange={handleOperatorChange}
-                            variant="label-hidden"
+                            variant="label-stacked"
                         ></lightning-combobox>
                     </div>
-                    <div class="slds-col slds-size_8-of-12">
+                    <div class="slds-col slds-size_7-of-12">
                         <template lwc:if={row.isBooleanValue}>
                             <lightning-combobox
                                 label="Value"
@@ -70,13 +70,13 @@
                                 disabled={disabled}
                                 data-index={row.index}
                                 onchange={handleValueChange}
-                                variant="label-hidden"
+                                variant="label-stacked"
                             ></lightning-combobox>
                         </template>
                         <template lwc:else>
+                            <label class="slds-form-element__label" for="value-input-{row.index}">Value</label>
                             <c-pflow-organism-resource-picker
                                 name={row.valueName}
-                                label="Value"
                                 value={row.value}
                                 value-type="reference"
                                 builder-context={builderContext}
@@ -102,4 +102,12 @@
         disabled={disabled}
         class="slds-m-top_xx-small"
     ></lightning-button>
+
+    <!-- Generated SOQL preview -->
+    <template lwc:if={hasPreviewSoql}>
+        <div class="cc-where-preview slds-m-top_small slds-p-around_x-small slds-box slds-theme_default">
+            <div class="slds-text-title_caps slds-text-color_weak slds-m-bottom_xx-small">Generated SOQL WHERE</div>
+            <code class="slds-text-body_regular slds-text-color_default">{previewSoql}</code>
+        </div>
+    </template>
 </template>

@@ -394,22 +394,15 @@ public with sharing class PFlowCpeChoiceEngineController {
         if (String.isBlank(objectName)) {
             return fields;
         }
-        Type t;
-        try {
-            t = Type.forName('Schema', objectName);
-        } catch (Exception e) {
+        Schema.SObjectType sot = Schema.getGlobalDescribe().get(objectName);
+        if (sot == null) {
             return fields;
         }
-        if (t == null) {
+        Schema.DescribeSObjectResult describe = sot.getDescribe();
+        if (!describe.isAccessible()) {
             return fields;
         }
-        SObject proto;
-        try {
-            proto = (SObject) t.newInstance();
-        } catch (Exception e) {
-            return fields;
-        }
-        Map<String, Schema.SObjectField> tokenMap = proto.getSObjectType().getDescribe().fields.getMap();
+        Map<String, Schema.SObjectField> tokenMap = describe.fields.getMap();
         for (String fn : tokenMap.keySet()) {
             Schema.DescribeFieldResult fr = tokenMap.get(fn).getDescribe();
             if (!fr.isAccessible()) {

@@ -6,3 +6,16 @@
 .cc-where-row {
     border-radius: 0.25rem;
 }
+
+.cc-where-preview {
+    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    border-radius: 0.25rem;
+}
+
+.cc-where-preview code {
+    display: block;
+    font-family: var(--slds-g-font-family-monospace, 'Consolas', 'Menlo', monospace);
+    font-size: 0.8125rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
