@@ -1,47 +1,57 @@
 <template>
     <div class="slds-p-around_small">
-        <lightning-input
-            label="SObject API Name"
-            value={_sobjectApiName}
-            onchange={handleSobjectChange}
-            class="slds-m-bottom_small"
-        ></lightning-input>
+        <div class="slds-m-bottom_medium">
+            <c-pflow-molecule-custom-lookup
+                label="SObject"
+                field-level-help="SObject the pickers and WHERE builder operate on."
+                placeholder="Search objects..."
+                variant="label-stacked"
+                selection={_sobjectSelection}
+                min-search-term-length="0"
+                scroll-after-n-items="8"
+                onsearch={handleSobjectSearch}
+                onselectionchange={handleSobjectSelectionChange}
+            ></c-pflow-molecule-custom-lookup>
+        </div>
 
         <div class="slds-m-bottom_medium">
-            <label class="slds-form-element__label">Single Field Picker</label>
             <c-pflow-molecule-field-picker
                 label="Sort Field"
+                field-level-help="Single-select field picker that emits a fieldchange event."
                 object-api-name={_sobjectApiName}
                 value={_sortField}
-                field-level-help="Single-select field picker — emits fieldchange."
                 onfieldchange={handleSortFieldChange}
             ></c-pflow-molecule-field-picker>
         </div>
 
         <div class="slds-m-bottom_medium">
-            <label class="slds-form-element__label">Multi Field Picker (isMultiEntry)</label>
             <c-pflow-molecule-field-picker
                 label="Additional Fields"
+                field-level-help="Same picker component with isMultiEntry set; renders pills and emits change with a CSV value."
                 object-api-name={_sobjectApiName}
                 value={_additionalFields}
-                is-multi-entry="true"
-                field-level-help="Same component, isMultiEntry toggles pill-mode."
+                is-multi-entry
                 onchange={handleAdditionalFieldsChange}
             ></c-pflow-molecule-field-picker>
         </div>
 
         <div class="slds-m-bottom_medium">
-            <label class="slds-form-element__label">Where Builder</label>
+            <label class="slds-form-element__label">
+                Where Clause
+                <lightning-helptext content="Visual WHERE builder. Operators are filtered by field type; emits wherechange with a SOQL fragment and parsed conditions."></lightning-helptext>
+            </label>
             <c-pflow-organism-where-builder
                 object-api-name={_sobjectApiName}
                 value={_whereClause}
-                field-level-help="Visual WHERE clause \u2014 emits wherechange with parsed conditions."
                 onwherechange={handleWhereChange}
             ></c-pflow-organism-where-builder>
         </div>
 
         <div>
-            <label class="slds-form-element__label">Order & Limit</label>
+            <label class="slds-form-element__label">
+                Order &amp; Limit
+                <lightning-helptext content="ORDER BY field + direction + optional LIMIT (clamped 0\u20132000)."></lightning-helptext>
+            </label>
             <c-pflow-molecule-order-limit
                 object-api-name={_sobjectApiName}
                 order-by-field={_orderByField}

@@ -1,14 +1,10 @@
 # Professor Flow | CPE Toolkit
 
-Reusable building blocks for Salesforce Flow **Custom Property Editors (CPEs)** — field pickers, a visual WHERE-clause builder, flow-resource picker, data-source selector, searchable lookup, validation mixin, and a pluggable schema-driven property-editor container.
+Reusable building blocks for Salesforce Flow **Custom Property Editors (CPEs)** — field pickers, a visual WHERE-clause builder, flow-resource picker, data-source selector, searchable lookup, validation mixin, and a shared field-metadata cache.
 
-Drop these into your own CPE LWC and skip the boilerplate.
+Drop these into your own CPE LWC and skip the boilerplate. **Zero of the pack's components appear in the Flow screen palette** — they're all internal-use LWCs consumed by your hand-written CPE.
 
-## Installed as a single package
-
-The toolkit ships as **one installable package**. Components depend on each other internally (pickers compose the lookup, the data source composes the WHERE builder, etc.), so there's no individual-component install. Install the pack once, use any combination of widgets.
-
-## What's included (v1.0) — 10 LWCs + 1 Apex controller
+## What's included (v1.0) — 9 LWCs + 1 Apex controller
 
 ### Atom
 
@@ -16,15 +12,14 @@ The toolkit ships as **one installable package**. Components depend on each othe
 
 ### Molecules
 
-- **`pflowMoleculeFieldPicker`** — Single or multi-select SObject field picker with type icons. Toggle modes with `@api isMultiEntry`.
+- **`pflowMoleculeFieldPicker`** — Single or multi-select SObject field picker. Toggle modes with `@api isMultiEntry`.
 - **`pflowMoleculeOrderLimit`** — ORDER BY field + direction + LIMIT (clamped 0–2000).
-- **`pflowMoleculeCustomLookup`** — Searchable lookup primitive with debounce + title-token highlighting. Used internally by the pickers but exposed for custom UIs.
+- **`pflowMoleculeCustomLookup`** — Searchable lookup primitive with debounce + title-token highlighting.
 
 ### Organisms
 
-- **`pflowOrganismPropertyEditor`** — Pluggable schema-driven CPE container. Accepts `@api schema` from a wrapper CPE — no shared schemaData file.
 - **`pflowOrganismWhereBuilder`** — Visual WHERE clause builder (operators filtered by field type, AND/OR).
-- **`pflowOrganismDataSource`** — Six-mode data-source selector (Single/Dual String Collections, Picklist Field, Visual Text Box, SOQL Lookup, SOSL Search).
+- **`pflowOrganismDataSource`** — Six-mode data-source selector (Collections / Picklist / Visual / SOQL / SOSL).
 - **`pflowOrganismResourcePicker`** — Flow variable / merge-field / literal picker (adapted from UnofficialSF `fsc_flowPicker3`).
 
 ### Utilities
@@ -34,63 +29,85 @@ The toolkit ships as **one installable package**. Components depend on each othe
 
 ### Apex
 
-- **`PFlowCpeChoiceEngineController`** — Unified @AuraEnabled API: object/field describe, SOQL/SOSL search, picklist values, record-type options, configuration validation. All dynamic SOQL enforces `AccessLevel.USER_MODE`.
+- **`PFlowCpeChoiceEngineController`** — Unified `@AuraEnabled` API: object/field describe, SOQL/SOSL search, picklist values, record-type options, configuration validation. All dynamic SOQL enforces `AccessLevel.USER_MODE`.
 
 ## Install
 
-The unmanaged package URLs will be published after the first packaging run.
-
-For now, clone and deploy:
+Clone and deploy:
 
 ```bash
 sf project deploy start -d force-app -o <org-alias>
 ```
 
-## Quick start — build a CPE for your own Flow screen component
+(Unmanaged package URLs will be published after the first package build.)
 
-The Property Editor is a **pluggable container**: each consuming LWC provides its own schema via a thin wrapper CPE.
+## Architecture
+
+The toolkit ships **pure reusable widgets**. Every pack LWC has `isExposed=false` so none of them clutter the Flow screen palette. You write your own CPE LWC (one per runtime component) and drop our widgets into its template.
+
+**Why no shared PropertyEditor?** A shared schema-driven CPE either requires a merge-conflict-magnet `schemaData.js` file (coreFlow's original pattern) or forces each consumer to ship a wrapper CPE that appears in the palette. Neither scales. Hand-rolled CPEs give you full control over layout, validation, and conditional visibility with minimal boilerplate when the widgets handle the hard parts.
+
+## Quick start — build a CPE for your own Flow screen component
 
 ### 1. Your runtime LWC
 
 `myRatingField.js-meta.xml`:
 
 ```xml
-<targetConfig targets="lightning__FlowScreen">
+<targetConfig targets="lightning__FlowScreen" configurationEditor="c-my-rating-field-cpe">
   <property name="label"    type="String"  label="Screen Label" />
   <property name="maxStars" type="Integer" label="Max Stars" default="5" />
   <property name="required" type="Boolean" label="Required" />
 </targetConfig>
-<configurationEditor>c-my-rating-field-cpe</configurationEditor>
 ```
 
-### 2. Your wrapper CPE LWC (10 lines)
+### 2. Your CPE LWC (uses our widgets)
 
 `myRatingFieldCpe.html`:
 
 ```html
 <template>
-  <c-pflow-organism-property-editor schema={schema}></c-pflow-organism-property-editor>
+  <c-pflow-molecule-field-picker
+    label="Sort field"
+    object-api-name={objectApiName}
+    value={sortField}
+    field-level-help="Field to sort the rating data by."
+    onfieldchange={handleSortFieldChange}
+  ></c-pflow-molecule-field-picker>
+
+  <c-pflow-organism-where-builder
+    object-api-name={objectApiName}
+    value={whereClause}
+    onwherechange={handleWhereChange}
+  ></c-pflow-organism-where-builder>
+
+  <c-pflow-molecule-order-limit
+    object-api-name={objectApiName}
+    order-by-field={orderField}
+    order-by-direction={orderDirection}
+    query-limit={queryLimit}
+    onorderchange={handleOrderChange}
+    onlimitchange={handleLimitChange}
+  ></c-pflow-molecule-order-limit>
 </template>
 ```
 
 `myRatingFieldCpe.js`:
 
 ```js
-import { LightningElement } from 'lwc';
-
+import { api, LightningElement } from 'lwc';
+const VALUE_CHANGED = 'configuration_editor_input_value_changed';
 export default class MyRatingFieldCpe extends LightningElement {
-  schema = [
-    {
-      key: 'display',
-      label: 'Display',
-      expanded: true,
-      properties: [
-        { name: 'label',    type: 'String',  label: 'Screen Label' },
-        { name: 'maxStars', type: 'Integer', label: 'Max Stars', default: 5 },
-        { name: 'required', type: 'Boolean', label: 'Required' }
-      ]
-    }
-  ];
+  @api builderContext;
+  @api inputVariables;
+  _fire(name, value, type) {
+    this.dispatchEvent(new CustomEvent(VALUE_CHANGED, {
+      bubbles: true, composed: true,
+      detail: { name, newValue: value ?? null, newValueDataType: type }
+    }));
+  }
+  handleSortFieldChange(e) { this._fire('sortField', e.detail.fieldApiName, 'String'); }
+  // ...
 }
 ```
 
@@ -106,24 +123,9 @@ export default class MyRatingFieldCpe extends LightningElement {
 </LightningComponentBundle>
 ```
 
-### 3. Add our widgets inside your own CPE (if you skip the Property Editor)
+Your CPE will appear in the palette (one per runtime component) — that's unavoidable for LWC CPEs per the Salesforce spec. Prefix its master label with `_` to sort it to the bottom and add `(Builder Only)` to warn users.
 
-```html
-<c-pflow-molecule-field-picker
-  label="Field to sort by"
-  object-api-name={objectApiName}
-  value={sortField}
-  onfieldchange={handleSortFieldChange}
-></c-pflow-molecule-field-picker>
-
-<c-pflow-organism-where-builder
-  object-api-name={objectApiName}
-  value={whereClause}
-  onwherechange={handleWhereChange}
-></c-pflow-organism-where-builder>
-```
-
-### 4. Extend the validation mixin in your runtime LWC
+### 3. Extend the validation mixin in your runtime LWC
 
 ```js
 import { LightningElement, api } from 'lwc';
@@ -139,23 +141,9 @@ export default class MyRatingField extends FlowValidationMixin(LightningElement)
 }
 ```
 
-## Architecture
+## Working demo
 
-Atomic design following the meridian LWC standard: `{appPrefix}{AtomicLevel}{ComponentName}`. The toolkit has **0 Atoms, 3 Molecules, 4 Organisms, 2 Utilities, 1 Checkbox Atom** — deliberately shallow since CPEs are fundamentally form rows with a few complex composite widgets.
-
-Internal composition:
-
-```
-pflowOrganismDataSource → pflowMoleculeCustomLookup + pflowMoleculeFieldPicker + pflowOrganismResourcePicker
-pflowMoleculeFieldPicker → pflowMoleculeCustomLookup + pflowUtilityCpeHelpers
-pflowOrganismResourcePicker → pflowUtilityCpeHelpers
-pflowOrganismWhereBuilder → pflowMoleculeCustomLookup
-All pickers share the field-metadata LRU cache via pflowUtilityCpeHelpers.
-```
-
-## Documentation
-
-Full component reference and tutorial: [professorflow.com/components/pflow-cpe-toolkit](https://professorflow.com/components/pflow-cpe-toolkit)
+The repo includes a full reference implementation in `force-app/main/default/lwc/demoWidgetsDirect*` — a star-rating runtime component paired with a hand-rolled CPE that exercises every widget (FieldPicker single + multi, WhereBuilder, OrderLimit, CustomLookup wired to `searchSObjectTypes` for SObject selection, ResourcePicker). Deploy it, drop `Demo | Widgets Direct` onto a screen, and you'll see the full pattern end-to-end.
 
 ## License
 

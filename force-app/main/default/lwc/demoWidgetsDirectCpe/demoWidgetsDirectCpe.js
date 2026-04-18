@@ -1,4 +1,5 @@
 import { api, LightningElement } from 'lwc';
+import searchSObjectTypes from '@salesforce/apex/PFlowCpeChoiceEngineController.searchSObjectTypes';
 
 /**
  * Hand-rolled wrapper CPE that uses the Toolkit's individual widgets directly
@@ -15,6 +16,7 @@ export default class DemoWidgetsDirectCpe extends LightningElement {
     @api genericTypeMappings;
 
     _sobjectApiName = 'Account';
+    _sobjectSelection = { id: 'Account', title: 'Account', subtitle: 'Account', icon: 'utility:sobject' };
     _sortField = '';
     _additionalFields = '';
     _whereClause = '';
@@ -35,6 +37,14 @@ export default class DemoWidgetsDirectCpe extends LightningElement {
                 switch (v.name) {
                     case 'sobjectApiName':
                         this._sobjectApiName = raw || 'Account';
+                        this._sobjectSelection = this._sobjectApiName
+                            ? {
+                                  id: this._sobjectApiName,
+                                  title: this._sobjectApiName,
+                                  subtitle: this._sobjectApiName,
+                                  icon: 'utility:sobject'
+                              }
+                            : null;
                         break;
                     case 'sortField':
                         this._sortField = raw;
@@ -71,15 +81,39 @@ export default class DemoWidgetsDirectCpe extends LightningElement {
         );
     }
 
-    handleSobjectChange(event) {
-        this._sobjectApiName = event.target.value || '';
-        // clear downstream selections when object changes
+    handleSobjectSearch(event) {
+        const lookup = event.currentTarget;
+        const term = (event.detail && event.detail.rawSearchTerm) || '';
+        searchSObjectTypes({ searchKey: term })
+            .then((rows) => {
+                if (lookup && typeof lookup.setSearchResults === 'function') {
+                    lookup.setSearchResults(Array.isArray(rows) ? rows : []);
+                }
+            })
+            .catch(() => {
+                if (lookup && typeof lookup.setSearchResults === 'function') {
+                    lookup.setSearchResults([]);
+                }
+            });
+    }
+
+    handleSobjectSelectionChange(event) {
+        const lookup = event.currentTarget;
+        const sel = lookup && typeof lookup.getSelection === 'function' ? lookup.getSelection() : null;
+        const row = Array.isArray(sel) ? sel[0] : sel;
+        const apiName = row && row.id ? String(row.id) : '';
+        if (apiName === this._sobjectApiName) return;
+        this._sobjectApiName = apiName;
+        this._sobjectSelection = apiName
+            ? { id: apiName, title: apiName, subtitle: apiName, icon: 'utility:sobject' }
+            : null;
+        // Clear downstream selections when the object changes.
         this._sortField = '';
         this._additionalFields = '';
         this._whereClause = '';
         this._orderByField = '';
         this._queryLimit = '';
-        this._fire('sobjectApiName', this._sobjectApiName, 'String');
+        this._fire('sobjectApiName', apiName || null, 'String');
         this._fire('sortField', null, 'String');
         this._fire('additionalFields', null, 'String');
         this._fire('whereClause', null, 'String');
@@ -88,20 +122,21 @@ export default class DemoWidgetsDirectCpe extends LightningElement {
     }
 
     handleSortFieldChange(event) {
-        const api = event.detail?.fieldApiName || '';
+        const api = (event.detail && event.detail.fieldApiName) || '';
         this._sortField = api;
         this._fire('sortField', api || null, 'String');
     }
 
     handleAdditionalFieldsChange(event) {
-        const csv = event.detail?.value ?? '';
-        this._additionalFields = csv || '';
+        const csv = (event.detail && event.detail.value) || '';
+        this._additionalFields = csv;
         this._fire('additionalFields', csv || null, 'String');
     }
 
     handleWhereChange(event) {
-        const clause = event.detail?.whereClause ?? event.detail?.value ?? '';
-        this._whereClause = clause || '';
+        const clause =
+            (event.detail && (event.detail.whereClause ?? event.detail.value)) || '';
+        this._whereClause = clause;
         this._fire('whereClause', clause || null, 'String');
     }
 
@@ -114,7 +149,7 @@ export default class DemoWidgetsDirectCpe extends LightningElement {
     }
 
     handleLimitChange(event) {
-        const n = event.detail?.queryLimit;
+        const n = event.detail && event.detail.queryLimit;
         this._queryLimit = n == null ? '' : String(n);
         this._fire('queryLimit', n == null ? null : n, 'Integer');
     }

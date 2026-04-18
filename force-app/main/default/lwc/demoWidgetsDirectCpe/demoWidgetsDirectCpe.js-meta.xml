@@ -2,8 +2,8 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>66.0</apiVersion>
     <isExposed>true</isExposed>
-    <masterLabel>Demo | Widgets Direct CPE (Builder Only)</masterLabel>
-    <description>Hand-rolled CPE using FieldPicker, WhereBuilder, OrderLimit directly. Do not drop directly onto a screen.</description>
+    <masterLabel>_ Demo | Widgets Direct CPE (DO NOT DROP)</masterLabel>
+    <description>Hand-rolled CPE using FieldPicker, WhereBuilder, OrderLimit directly.</description>
     <targets>
         <target>lightning__FlowScreen</target>
     </targets>
