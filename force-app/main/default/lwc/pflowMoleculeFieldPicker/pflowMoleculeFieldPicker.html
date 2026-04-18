@@ -1,9 +1,11 @@
 <template>
     <template lwc:if={isMultiEntry}>
-        <label lwc:if={label} class="slds-form-element__label">{label}</label>
-        <template lwc:if={fieldLevelHelp}>
-            <div class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-bottom_xx-small">
-                {fieldLevelHelp}
+        <template lwc:if={label}>
+            <div class="slds-form-element slds-m-bottom_xx-small">
+                <label class="slds-form-element__label">{label}</label>
+                <template lwc:if={fieldLevelHelp}>
+                    <lightning-helptext content={fieldLevelHelp}></lightning-helptext>
+                </template>
             </div>
         </template>
         <template lwc:if={hasSelected}>

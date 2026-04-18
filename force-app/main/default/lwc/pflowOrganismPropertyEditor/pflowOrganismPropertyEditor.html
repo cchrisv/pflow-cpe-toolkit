@@ -40,6 +40,7 @@
                                             name={prop.name}
                                             label={prop.label}
                                             required={prop.editorRequired}
+                                            field-level-help={prop.description}
                                             value={prop.displayValue}
                                             value-type={prop.pickerValueType}
                                             builder-context={builderContext}
@@ -56,6 +57,7 @@
                                                 data-prop-name={prop.name}
                                                 label={prop.label}
                                                 required={prop.editorRequired}
+                                                field-level-help={prop.description}
                                                 value={prop.displayValue}
                                                 options={prop.picklistOptions}
                                                 dropdown-alignment="bottom-left"
@@ -69,6 +71,7 @@
                                                     data-prop-name={prop.name}
                                                     label={prop.label}
                                                     required={prop.editorRequired}
+                                                    field-level-help={prop.description}
                                                     value={prop.displayValue}
                                                     onchange={handleTextChange}
                                                 ></lightning-textarea>
@@ -77,24 +80,20 @@
                                             <template if:false={prop.multiline}>
                                                 <template if:true={prop.isPatternField}>
                                                     <lightning-combobox
-                                                        label="Common formats (no regex knowledge needed)"
+                                                        label="Common formats"
+                                                        field-level-help="Pick one to fill the pattern automatically. Use Custom only if IT or a spec gave you an exact pattern."
                                                         value={prop.patternPresetValue}
                                                         options={prop.patternPresetOptions}
                                                         dropdown-alignment="bottom-left"
                                                         onchange={handlePatternPresetChange}
                                                     ></lightning-combobox>
-                                                    <div
-                                                        class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-top_xx-small"
-                                                    >
-                                                        Pick one to fill the pattern automatically. Use Custom only if IT
-                                                        or a spec gave you an exact pattern.
-                                                    </div>
                                                     <lightning-input
                                                         class="slds-m-top_small"
                                                         type="text"
                                                         data-prop-name={prop.name}
                                                         label={prop.label}
                                                         placeholder={prop.placeholder}
+                                                        field-level-help={prop.description}
                                                         value={prop.displayValue}
                                                         onchange={handleTextChange}
                                                     ></lightning-input>
@@ -102,6 +101,7 @@
                                                         class="slds-m-top_small"
                                                         type="text"
                                                         label="Try sample text"
+                                                        field-level-help="Type what a user might enter and we'll tell you whether it matches the pattern above."
                                                         placeholder="Type what a user might enter"
                                                         value={patternSampleText}
                                                         onchange={handlePatternSampleChange}
@@ -117,6 +117,7 @@
                                                             type="toggle"
                                                             data-prop-name={prop.name}
                                                             label={prop.label}
+                                                            field-level-help={prop.description}
                                                             checked={prop.checkedBool}
                                                             message-toggle-active=""
                                                             message-toggle-inactive=""
@@ -132,6 +133,7 @@
                                                                 data-prop-name={prop.name}
                                                                 label={prop.label}
                                                                 required={prop.editorRequired}
+                                                                field-level-help={prop.description}
                                                                 value={prop.displayValue}
                                                                 onchange={handleIntegerChange}
                                                             ></lightning-input>
@@ -144,6 +146,7 @@
                                                                     data-prop-name={prop.name}
                                                                     label={prop.label}
                                                                     required={prop.editorRequired}
+                                                                    field-level-help={prop.description}
                                                                     value={prop.displayValue}
                                                                     onchange={handleDateChange}
                                                                 ></lightning-input>
@@ -156,6 +159,7 @@
                                                                         data-prop-name={prop.name}
                                                                         label={prop.label}
                                                                         required={prop.editorRequired}
+                                                                        field-level-help={prop.description}
                                                                         value={prop.displayValue}
                                                                         onchange={handleDateTimeChange}
                                                                     ></lightning-input>
@@ -168,6 +172,7 @@
                                                                         label={prop.label}
                                                                         placeholder={prop.placeholder}
                                                                         required={prop.editorRequired}
+                                                                        field-level-help={prop.description}
                                                                         value={prop.displayValue}
                                                                         onchange={handleTextChange}
                                                                     ></lightning-input>
@@ -178,13 +183,6 @@
                                                 </template>
                                             </template>
                                         </template>
-                                    </template>
-                                    <template lwc:if={prop.description}>
-                                        <div
-                                            class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-top_xx-small"
-                                        >
-                                            {prop.description}
-                                        </div>
                                     </template>
                                 </div>
                             </template>
@@ -197,18 +195,12 @@
                                                 type="toggle"
                                                 data-prop-name={prop.name}
                                                 label={prop.label}
+                                                field-level-help={prop.description}
                                                 checked={prop.checkedBool}
                                                 message-toggle-active=""
                                                 message-toggle-inactive=""
                                                 onchange={handleBooleanToggleChange}
                                             ></lightning-input>
-                                            <template lwc:if={prop.description}>
-                                                <div
-                                                    class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-top_xx-small"
-                                                >
-                                                    {prop.description}
-                                                </div>
-                                            </template>
                                         </div>
                                     </template>
                                 </div>

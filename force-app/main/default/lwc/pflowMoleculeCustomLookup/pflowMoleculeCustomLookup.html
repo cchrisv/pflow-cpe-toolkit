@@ -4,12 +4,10 @@
             <label class="slds-form-element__label" for={inputId}>
                 <abbr lwc:if={required} class="slds-required" title="required">*</abbr>
                 {label}
+                <template lwc:if={fieldLevelHelp}>
+                    <lightning-helptext content={fieldLevelHelp}></lightning-helptext>
+                </template>
             </label>
-            <template lwc:if={fieldLevelHelp}>
-                <div class="slds-form-element__help slds-text-body_small slds-text-color_weak slds-m-bottom_xx-small">
-                    {fieldLevelHelp}
-                </div>
-            </template>
         </template>
         <div class="slds-form-element__control">
             <div class="slds-combobox_container">
